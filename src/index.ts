@@ -9,7 +9,7 @@ import {
 } from 'lit-element';
 
 // TODO Add your configuration elements here for type-checking
-interface BoilerplateConfig {
+export interface BoilerplateConfig {
   type: string;
   name?: string;
   show_warning?: boolean;
@@ -19,6 +19,15 @@ interface BoilerplateConfig {
 // TODO Name your custom element
 @customElement('boilerplate-card')
 class BoilerplateCard extends LitElement {
+  public static async getConfigElement(): Promise<HTMLElement> {
+    await import(/* webpackChunkName: "boilerplate-editor" */ './editor');
+    return window.document.createElement('boilerplate-card-editor');
+  }
+
+  public static getStubConfig(): object {
+    return {};
+  }
+
   // TODO Add any properities that should cause your element to re-render here
   @property() public hass?: any;
 

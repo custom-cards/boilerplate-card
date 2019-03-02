@@ -12,6 +12,7 @@ rules:
   no-nested-ternary: 0
   camelcase: 0
   no-unused-vars: 0
+  import/prefer-default-export: 0
 globals:
   window: true
   Event: true

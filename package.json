@@ -15,7 +15,10 @@
     "author": "BoilerPlate <boilerplate@email.com>",
     "license": "MIT",
     "dependencies": {
-        "lit-element": "^2.0.1"
+        "@polymer/paper-input": "^3.0.1",
+        "@polymer/paper-toggle-button": "^3.0.1",
+        "lit-element": "^2.0.1",
+        "superstruct": "^0.6.0"
     },
     "devDependencies": {
         "@typescript-eslint/parser": "^1.4.1",
