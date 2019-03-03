@@ -2304,6 +2304,13 @@ LitElement.render = render$1;
 
 // TODO Name your custom element
 let BoilerplateCard = class BoilerplateCard extends LitElement {
+    // public static async getConfigElement(): Promise<HTMLElement> {
+    //   await import(/* webpackChunkName: "boilerplate-editor" */ './editor');
+    //   return window.document.createElement('boilerplate-card-editor');
+    // }
+    static getStubConfig() {
+        return {};
+    }
     setConfig(config) {
         // TODO Check for required fields and that they are of the proper format
         if (!config || config.show_error) {
@@ -2320,12 +2327,11 @@ let BoilerplateCard = class BoilerplateCard extends LitElement {
             return html `
         <ha-card>
           <div class="warning">Show Warning</div>
-        </ha-card>`;
+        </ha-card>
+      `;
         }
         return html `
-      <ha-card
-        .header=${this._config.name ? this._config.name : 'Boilerplate'}
-      ></ha-card>
+      <ha-card .header=${this._config.name ? this._config.name : 'Boilerplate'}></ha-card>
     `;
     }
     static get styles() {

@@ -13,6 +13,8 @@ rules:
   camelcase: 0
   no-unused-vars: 0
   import/prefer-default-export: 0
+  no-param-reassign: 0
+  import/no-unresolved: 0
 globals:
   window: true
   Event: true

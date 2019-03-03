@@ -121,7 +121,7 @@ export class BoilerplateCardEditor extends LitElement {
     const event = new Event(type, {
       bubbles: options.bubbles === undefined ? true : options.bubbles,
       cancelable: Boolean(options.cancelable),
-      composed: options.composed === undefined ? true : options.composed
+      composed: options.composed === undefined ? true : options.composed,
     }) as any;
 
     event.detail = detail;

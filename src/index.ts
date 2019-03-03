@@ -19,10 +19,10 @@ export interface BoilerplateConfig {
 // TODO Name your custom element
 @customElement('boilerplate-card')
 class BoilerplateCard extends LitElement {
-  public static async getConfigElement(): Promise<HTMLElement> {
-    await import(/* webpackChunkName: "boilerplate-editor" */ './editor');
-    return window.document.createElement('boilerplate-card-editor');
-  }
+  // public static async getConfigElement(): Promise<HTMLElement> {
+  //   await import(/* webpackChunkName: "boilerplate-editor" */ './editor');
+  //   return window.document.createElement('boilerplate-card-editor');
+  // }
 
   public static getStubConfig(): object {
     return {};
