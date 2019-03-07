@@ -11,7 +11,7 @@ import '@polymer/paper-input/paper-input';
 import '@polymer/paper-toggle-button/paper-toggle-button';
 import { superstruct } from 'superstruct';
 
-import { BoilerplateConfig } from './index';
+import { BoilerplateConfig } from './boilerplate-types';
 
 const cardConfigStruct = superstruct({
   type: 'string',

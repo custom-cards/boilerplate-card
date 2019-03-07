@@ -7,22 +7,15 @@ import {
   TemplateResult,
   css,
 } from 'lit-element';
-
-// TODO Add your configuration elements here for type-checking
-export interface BoilerplateConfig {
-  type: string;
-  name?: string;
-  show_warning?: boolean;
-  show_error?: boolean;
-}
+import { BoilerplateConfig } from './boilerplate-types';
 
 // TODO Name your custom element
 @customElement('boilerplate-card')
 class BoilerplateCard extends LitElement {
-  // public static async getConfigElement(): Promise<HTMLElement> {
-  //   await import(/* webpackChunkName: "boilerplate-editor" */ './editor');
-  //   return window.document.createElement('boilerplate-card-editor');
-  // }
+  public static async getConfigElement(): Promise<HTMLElement> {
+    await import(/* webpackChunkName: "boilerplate-card-editor" */ './boilerplate-card-editor');
+    return window.document.createElement('boilerplate-card-editor');
+  }
 
   public static getStubConfig(): object {
     return {};
