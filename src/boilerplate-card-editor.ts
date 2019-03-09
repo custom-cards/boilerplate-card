@@ -5,24 +5,23 @@ import {
   customElement,
   property,
   css,
-  CSSResult,
-} from 'lit-element';
-import '@polymer/paper-input/paper-input';
-import '@polymer/paper-toggle-button/paper-toggle-button';
-import { superstruct } from 'superstruct';
+  CSSResult
+} from "lit-element";
+import { Switch } from "@material/mwc-switch";
+import { superstruct } from "superstruct";
 
-import { BoilerplateConfig } from './boilerplate-types';
+import { BoilerplateConfig, HomeAssistant, ValidHassDomEvent } from "./types";
 
 const cardConfigStruct = superstruct({
-  type: 'string',
-  name: 'string?',
-  show_error: 'boolean?',
-  show_warning: 'boolean?',
+  type: "string",
+  name: "string?",
+  show_error: "boolean?",
+  show_warning: "boolean?"
 });
 
-@customElement('boilerplate-card-editor')
+@customElement("boilerplate-card-editor")
 export class BoilerplateCardEditor extends LitElement {
-  @property() public hass?: any;
+  @property() public hass?: HomeAssistant;
 
   @property() private _config?: BoilerplateConfig;
 
@@ -32,7 +31,7 @@ export class BoilerplateCardEditor extends LitElement {
   }
 
   get _name(): string {
-    return this._config!.name || '';
+    return this._config!.name || "";
   }
 
   get _show_error(): boolean {
@@ -49,29 +48,33 @@ export class BoilerplateCardEditor extends LitElement {
     }
 
     return html`
-      <div class="card-config">
-        <paper-input
-          label="Name (Optional)"
-          .value="${this._name}"
-          .configValue="${' name'}"
-          @value-changed="${this._valueChanged}"
-        ></paper-input>
-        <div class="side-by-side">
-          <paper-toggle-button
-            ?checked="${this._show_error !== false}"
-            .configValue="${'show_error'}"
-            @change="${this._valueChanged}"
-            >Show Error?</paper-toggle-button
-          >
-          <paper-toggle-button
-            ?checked="${this._show_warning !== false}"
-            .configValue="${'show_warning'}"
-            @change="${this._valueChanged}"
-            >Show Warning?</paper-toggle-button
-          >
-        </div>
-      </div>
+      <mwc-switch>sentiment_very_satisfied</mwc-switch>
     `;
+
+    // return html`
+    //   <div class="card-config">
+    //     <paper-input
+    //       label="Name (Optional)"
+    //       .value="${this._name}"
+    //       .configValue="${' name'}"
+    //       @value-changed="${this._valueChanged}"
+    //     ></paper-input>
+    //     <div class="side-by-side">
+    //       <paper-toggle-button
+    //         ?checked="${this._show_error !== false}"
+    //         .configValue="${'show_error'}"
+    //         @change="${this._valueChanged}"
+    //         >Show Error?</paper-toggle-button
+    //       >
+    //       <paper-toggle-button
+    //         ?checked="${this._show_warning !== false}"
+    //         .configValue="${'show_warning'}"
+    //         @change="${this._valueChanged}"
+    //         >Show Warning?</paper-toggle-button
+    //       >
+    //     </div>
+    //   </div>
+    // `;
   }
 
   static get styles(): CSSResult {
@@ -96,32 +99,47 @@ export class BoilerplateCardEditor extends LitElement {
     const target = ev.target! as any;
 
     if (
-      this[`_${target.configValue}`] === target.value
-      || this[`_${target.configValue}`] === target.config
+      this[`_${target.configValue}`] === target.value ||
+      this[`_${target.configValue}`] === target.config
     ) {
       return;
     }
     if (target.configValue) {
-      if (target.value === '') {
+      if (target.value === "") {
         delete this._config[target.configValue!];
       } else {
         this._config = {
           ...this._config,
-          [target.configValue]: target.checked !== undefined ? target.checked : target.value,
+          [target.configValue]:
+            target.checked !== undefined ? target.checked : target.value
         };
       }
     }
 
-    this._fireEvent(this, 'config-changed', { config: this._config }, null);
+    this._fireEvent(
+      this,
+      "config-changed",
+      { config: this._config },
+      undefined
+    );
   }
 
-  private _fireEvent = (node, type, detail, options) => {
+  private _fireEvent = <HassEvent extends ValidHassDomEvent>(
+    node: HTMLElement | Window,
+    type: HassEvent,
+    detail?: HASSDomEvents[HassEvent],
+    options?: {
+      bubbles?: boolean;
+      cancelable?: boolean;
+      composed?: boolean;
+    }
+  ) => {
     options = options || {};
     detail = detail === null || detail === undefined ? {} : detail;
     const event = new Event(type, {
       bubbles: options.bubbles === undefined ? true : options.bubbles,
       cancelable: Boolean(options.cancelable),
-      composed: options.composed === undefined ? true : options.composed,
+      composed: options.composed === undefined ? true : options.composed
     }) as any;
 
     event.detail = detail;

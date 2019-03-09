@@ -1,5 +1,6 @@
 import resolve from 'rollup-plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
+import ignore from 'rollup-plugin-ignore';
 
 export default {
   input: ['src/boilerplate-card-editor.ts', 'src/boilerplate-card.ts'],
@@ -7,5 +8,5 @@ export default {
     dir: './dist',
     format: 'es',
   },
-  plugins: [resolve(), typescript()],
+  plugins: [ignore("@polymer/polymer"), resolve(), typescript()],
 };

@@ -1,10 +1,10 @@
-import { d as __decorate, e as property, f as customElement, a as LitElement, b as html, c as css } from './chunk-d5e41da3.js';
+import { d as __decorate, e as property, f as customElement, a as LitElement, b as html, c as css } from './chunk-23407cba.js';
 
 // TODO Name your custom element
 let BoilerplateCard = class BoilerplateCard extends LitElement {
     static async getConfigElement() {
-        await import(/* webpackChunkName: "boilerplate-card-editor" */ './boilerplate-card-editor.js');
-        return window.document.createElement('boilerplate-card-editor');
+        await import('./boilerplate-card-editor.js');
+        return window.document.createElement("boilerplate-card-editor");
     }
     static getStubConfig() {
         return {};
@@ -12,7 +12,7 @@ let BoilerplateCard = class BoilerplateCard extends LitElement {
     setConfig(config) {
         // TODO Check for required fields and that they are of the proper format
         if (!config || config.show_error) {
-            throw new Error('Invalid configuration');
+            throw new Error("Invalid configuration");
         }
         this._config = config;
     }
@@ -29,7 +29,9 @@ let BoilerplateCard = class BoilerplateCard extends LitElement {
       `;
         }
         return html `
-      <ha-card .header=${this._config.name ? this._config.name : 'Boilerplate'}></ha-card>
+      <ha-card
+        .header=${this._config.name ? this._config.name : "Boilerplate"}
+      ></ha-card>
     `;
     }
     static get styles() {
@@ -50,5 +52,5 @@ __decorate([
     property()
 ], BoilerplateCard.prototype, "_config", void 0);
 BoilerplateCard = __decorate([
-    customElement('boilerplate-card')
+    customElement("boilerplate-card")
 ], BoilerplateCard);

@@ -5,16 +5,16 @@ import {
   property,
   CSSResult,
   TemplateResult,
-  css,
-} from 'lit-element';
-import { BoilerplateConfig } from './boilerplate-types';
+  css
+} from "lit-element";
+import { BoilerplateConfig, HomeAssistant } from "./types";
 
 // TODO Name your custom element
-@customElement('boilerplate-card')
+@customElement("boilerplate-card")
 class BoilerplateCard extends LitElement {
   public static async getConfigElement(): Promise<HTMLElement> {
-    await import(/* webpackChunkName: "boilerplate-card-editor" */ './boilerplate-card-editor');
-    return window.document.createElement('boilerplate-card-editor');
+    await import(/* webpackChunkName: "boilerplate-card-editor" */ "./boilerplate-card-editor");
+    return window.document.createElement("boilerplate-card-editor");
   }
 
   public static getStubConfig(): object {
@@ -22,14 +22,14 @@ class BoilerplateCard extends LitElement {
   }
 
   // TODO Add any properities that should cause your element to re-render here
-  @property() public hass?: any;
+  @property() public hass?: HomeAssistant;
 
   @property() private _config?: BoilerplateConfig;
 
   public setConfig(config: BoilerplateConfig): void {
     // TODO Check for required fields and that they are of the proper format
     if (!config || config.show_error) {
-      throw new Error('Invalid configuration');
+      throw new Error("Invalid configuration");
     }
 
     this._config = config;
@@ -50,7 +50,9 @@ class BoilerplateCard extends LitElement {
     }
 
     return html`
-      <ha-card .header=${this._config.name ? this._config.name : 'Boilerplate'}></ha-card>
+      <ha-card
+        .header=${this._config.name ? this._config.name : "Boilerplate"}
+      ></ha-card>
     `;
   }
 

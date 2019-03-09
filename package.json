@@ -15,10 +15,10 @@
     "author": "BoilerPlate <boilerplate@email.com>",
     "license": "MIT",
     "dependencies": {
-        "@polymer/paper-input": "^3.0.1",
-        "@polymer/paper-toggle-button": "^3.0.1",
+        "@material/mwc-switch": "^0.3.6",
         "lit-element": "^2.0.1",
-        "superstruct": "^0.6.0"
+        "superstruct": "^0.6.0",
+        "home-assistant-js-websocket": "^3.3.0"
     },
     "devDependencies": {
         "@typescript-eslint/parser": "^1.4.1",
@@ -28,6 +28,7 @@
         "eslint-plugin-typescript": "^0.14.0",
         "prettier": "^1.16.4",
         "rollup": "^1.2.3",
+        "rollup-plugin-ignore": "^1.0.5",
         "rollup-plugin-node-resolve": "^4.0.1",
         "rollup-plugin-typescript2": "^0.19.2",
         "typescript": "^3.3.3333"
