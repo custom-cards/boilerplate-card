@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+function Preview {
+  ReBuild
+  CreateDefaultConfig
+  hass -c /config
+}
+
+function ReBuild {
+  Install
+  npm run build
+  rm -R /config/www || echo ""
+  mkdir -p /config/www
+  cp dist/*.js /config/www/
+}
+
+function Install {
+  if [ ! -f /tmp/npminstall ]; then
+    npm install
+    touch /tmp/npminstall
+  fi
+}
+
+function CreateDefaultConfig {
+  if [ ! -f /conifg/configuration.yaml ]; then
+    echo "default_config" >> /conifg/configuration.yaml
+    echo "demo" >> /conifg/configuration.yaml
+  fi
+}

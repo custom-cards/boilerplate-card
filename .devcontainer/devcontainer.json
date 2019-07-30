@@ -1,0 +1,23 @@
+// See https://aka.ms/vscode-remote/devcontainer.json for format details.
+{
+  "context": "..",
+  "dockerFile": "Dockerfile",
+  "appPort": "8124:8123",
+  "runArgs": ["-e", "GIT_EDTIOR='code --wait'"],
+  "extensions": [
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "esbenp.prettier-vscode",
+    "bierner.lit-html",
+    "runem.lit-plugin",
+    "github.vscode-pull-request-github",
+    "tabnine.tabnine-vscode"
+  ],
+  "settings": {
+    "files.eol": "\n",
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "files.trimTrailingWhitespace": true
+  }
+}
