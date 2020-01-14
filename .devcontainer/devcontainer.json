@@ -1,6 +1,6 @@
 // See https://aka.ms/vscode-remote/devcontainer.json for format details.
 {
-  "name": "Boilerplate Card Development",
+  "name": "Mwc-Element Development",
   "image": "ludeeus/devcontainer:monster-stable",
   "context": "..",
   "appPort": ["5000:5000", "9123:8123"],
