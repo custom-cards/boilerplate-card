@@ -116,7 +116,7 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
     }
 
     // You can restrict on domain type
-    const entities = Object.keys(this.hass.states).filter(eid => eid.substr(0, eid.indexOf('.')) === 'sun');
+    const entities = Object.keys(this.hass.states).filter((eid) => eid.substr(0, eid.indexOf('.')) === 'sun');
 
     return html`
       <div class="card-config">
@@ -136,10 +136,8 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
                   .configValue=${'entity'}
                 >
                   <paper-listbox slot="dropdown-content" .selected=${entities.indexOf(this._entity)}>
-                    ${entities.map(entity => {
-                      return html`
-                        <paper-item>${entity}</paper-item>
-                      `;
+                    ${entities.map((entity) => {
+                      return html` <paper-item>${entity}</paper-item> `;
                     })}
                   </paper-listbox>
                 </paper-dropdown-menu>
@@ -264,17 +262,19 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
     if (this[`_${target.configValue}`] === target.value) {
       return;
     }
+    let config = Object.assign({}, this._config);
     if (target.configValue) {
       if (target.value === '') {
-        delete this._config[target.configValue];
+        delete config[target.configValue];
       } else {
-        this._config = {
-          ...this._config,
+        config = {
+          ...config,
           [target.configValue]: target.checked !== undefined ? target.checked : target.value,
         };
       }
     }
-    fireEvent(this, 'config-changed', { config: this._config });
+
+    fireEvent(this, 'config-changed', { config: config });
   }
 
   static get styles(): CSSResult {
