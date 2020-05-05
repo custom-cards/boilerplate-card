@@ -113,13 +113,6 @@ export class BoilerplateCard extends LitElement {
   }
 
   static get styles(): CSSResult {
-    return css`
-      .warning {
-        display: block;
-        color: black;
-        background-color: #fce588;
-        padding: 8px;
-      }
-    `;
+    return css``;
   }
 }
