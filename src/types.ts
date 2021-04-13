@@ -10,7 +10,7 @@ declare global {
 // TODO Add your configuration elements here for type-checking
 export interface BannerCardExtConfig extends LovelaceCardConfig {
   type: string;
-  name?: string;
+  name?: any;
   show_warning?: boolean;
   show_error?: boolean;
   rowSize?: number;

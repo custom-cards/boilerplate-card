@@ -197,7 +197,7 @@ export class BannerCardExt extends LitElement {
   }
 
   private _renderHeading(): TemplateResult {
-    let heading = this.config.heading;
+    let heading = this.config.name;
     if (heading === false) {
       return html``;
     }
