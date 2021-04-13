@@ -1,0 +1,7 @@
+{
+  "common": {
+    "version": "Версия",
+    "invalid_configuration": "Не верная конфигурация",
+    "show_warning": "Показывать предупреждения"
+  }
+}

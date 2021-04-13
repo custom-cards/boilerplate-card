@@ -8,20 +8,26 @@ declare global {
 }
 
 // TODO Add your configuration elements here for type-checking
-export interface BoilerplateCardConfig extends LovelaceCardConfig {
+export interface BannerCardExtConfig extends LovelaceCardConfig {
   type: string;
   name?: string;
   show_warning?: boolean;
   show_error?: boolean;
+  rowSize?: number;
   test_gui?: boolean;
-  entities: BoilerplateCardEntityConfig[];
+  color?: string;
+  entities: BannerCardExtConfigEntityConfig[];
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
   double_tap_action?: ActionConfig;
 }
 
-export interface BoilerplateCardEntityConfig extends EntityConfig {
+export interface BannerCardExtConfigEntityConfig extends EntityConfig {
+  domain: any;
+  attribute?: any;
+  error?: any;
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
   double_tap_action?: ActionConfig;
+  size?: number;
 }
