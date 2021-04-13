@@ -117,8 +117,10 @@ export class BannerCardExt extends LitElement {
     // Will either:
     // set .value to be the key from entities.*.map_value.{key} that matches the current `state` if the value is a string
     // or set all values as dynamicData if it is an object
-    const dynamicData = {};
-    /* TODO
+    const dynamicData = {
+      value: undefined
+    };
+    
     if (config.map_state && state.state in config.map_state) {
       const mappedState = config.map_state[state.state];
       const mapStateType = typeof mappedState;
@@ -130,7 +132,6 @@ export class BannerCardExt extends LitElement {
         });
       }
     }
-    */
 
     const data = {
       name: attributes.friendly_name,
