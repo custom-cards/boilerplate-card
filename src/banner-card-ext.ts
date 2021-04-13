@@ -107,7 +107,7 @@ export class BannerCardExt extends LitElement {
               "var(--bc-heading-color-dark)"
           ),
       rowSize: rowSize,
-      entities: (config.entities || []).map(this._parseEntity),
+      entities: (config.entities || []).map(parseEntity),
     };
   }
 
