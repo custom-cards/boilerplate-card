@@ -99,7 +99,6 @@ export class BannerCardExt extends LitElement {
 
     this.config = {
       ...config,
-      name: 'Boilerplate',
       color: config.color ||
           readableColor(
               config.background,
