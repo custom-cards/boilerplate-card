@@ -323,7 +323,7 @@ export class BannerCardExt extends LitElement {
     );
     return html`
       <a class="entity-state" style="${this.grid(config.size)}">
-        ${this._renderEntityName(name)}
+        ${this._renderEntityName(config.name)}
         <span class="entity-value">${htmlContent}</span>
       </a>
     `;
