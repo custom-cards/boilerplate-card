@@ -13,6 +13,7 @@ export interface BannerCardExtConfig extends LovelaceCardConfig {
   name?: any;
   show_warning?: boolean;
   show_error?: boolean;
+  debug?: boolean;
   rowSize?: number;
   test_gui?: boolean;
   color?: string;

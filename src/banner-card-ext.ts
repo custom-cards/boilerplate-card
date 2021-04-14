@@ -32,7 +32,7 @@ import filterEntity from "./filterEntity";
 
 /* eslint no-console: 0 */
 console.info(
-  `%c  BOILERPLATE-CARD \n%c  ${localize('common.version')} ${CARD_VERSION}    `,
+  `%c  BANNER-CARD-EXT \n%c  ${localize('common.version')} ${CARD_VERSION}    `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );
@@ -122,14 +122,24 @@ export class BannerCardExt extends LitElement {
     };
     
     if (config.map_state && state.state in config.map_state) {
+      this._log("-----------------------------------");
+      this._log("Mapped state found for " + config.entity);
       const mappedState = config.map_state[state.state];
+      this._log("Current state " + state.state);
+      this._log(mappedState);
+      this._log("Mapped state type:");
       const mapStateType = typeof mappedState;
+      this._log(mapStateType);
       if (mapStateType === "string") {
         dynamicData.value = mappedState;
+        this._log("Mapped state is string");
       } else if (mapStateType === "object") {
+        this._log("Mapped state is object");
         Object.entries(mappedState).forEach(([key, val]) => {
           dynamicData[key] = val;
         });
+      } else {
+        this._log("Mapped state is what??");
       }
     }
 
@@ -363,6 +373,12 @@ export class BannerCardExt extends LitElement {
     return html`
       <hui-warning>${warning}</hui-warning>
     `;
+  }
+
+  private _log(message: string): void {
+    if (this.config.debug) {
+      console.log("[banner-card-ex] " + message);
+    }
   }
 
   private _showError(error: string): TemplateResult {
