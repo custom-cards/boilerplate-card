@@ -12,7 +12,6 @@ import {
 } from 'lit-element';
 import {
   HomeAssistant,
-  hasConfigOrEntityChanged,
   hasAction,
   ActionHandlerEvent,
   handleAction,
@@ -23,6 +22,7 @@ import {
 //TODO wtf? Take from original repository https://github.com/custom-cards/boilerplate-card
 //import './editor';
 
+import { hasConfigOrEntitiesChanged } from './has-changed';
 import type { BannerCardExtConfig, BannerCardExtConfigEntityConfig } from './types';
 import { parseEntity, getAttributeOrState, readableColor, isIcon } from "./utils";
 import { actionHandler } from './action-handler-directive';
@@ -66,15 +66,11 @@ export class BannerCardExt extends LitElement {
 
   set hass(hass) {
     this._hass = hass;
-
-    // Parse new state values for _entities_
-    this.entityValues = (this.config.entities || [])
-        .filter((conf) => filterEntity(conf, hass.states))
-        .map((conf) => this._parseEntity(conf));
   }
 
   // https://lit-element.polymer-project.org/guide/properties#accessors-custom
   public setConfig(config: BannerCardExtConfig): void {
+    this._log("Set config");
     // TODO Check for required fields and that they are of the proper format
     if (!config) {
       throw new Error(localize('common.invalid_configuration'));
@@ -111,7 +107,6 @@ export class BannerCardExt extends LitElement {
   }
 
   private _parseEntity(config): BannerCardExtConfigEntityConfig {
-    this._log("----------------- parsing " + config.entity);
     const state = this._hass.states[config.entity];
     const attributes = state ? state.attributes : {};
 
@@ -121,17 +116,11 @@ export class BannerCardExt extends LitElement {
     let dynamicData: any;
     
     if (config.map_state && state.state in config.map_state) {
-      this._log("Mapped state found for sate " + state.state);
       const mappedState = config.map_state[state.state];
-      this._log(mappedState, true);
-      this._log("Mapped state type:");
       const mapStateType = typeof mappedState;
-      this._log(mapStateType);
       if (mapStateType === "string") {
         dynamicData = {value: mappedState};
-        this._log("Mapped state is string");
       } else if (mapStateType === "object") {
-        this._log("Mapped state is object");
         dynamicData = {};
         Object.entries(mappedState).forEach(([key, val]) => {
           dynamicData[key] = val;
@@ -152,12 +141,6 @@ export class BannerCardExt extends LitElement {
       data.state = attributes.current_position;
     }
 
-    this._log("Entity data: data, config, dynamicData:")
-    this._log(data, true);
-    this._log(config, true);
-    this._log(dynamicData, true);
-    this._log("----------------- end");
-
     return {
       ...data,
       ...config,
@@ -167,16 +150,18 @@ export class BannerCardExt extends LitElement {
 
   // https://lit-element.polymer-project.org/guide/lifecycle#shouldupdate
   //TODO bring it back on update issues
-  /*protected shouldUpdate(changedProps: PropertyValues): boolean {
+  protected shouldUpdate(changedProps: PropertyValues): boolean {
+    this._log("Should update?");
     if (!this.config) {
       return false;
     }
 
-    return hasConfigOrEntityChanged(this, changedProps, false);
-  }*/
+    return hasConfigOrEntitiesChanged(this, changedProps, false);
+  }
 
   // https://lit-element.polymer-project.org/guide/templates
   protected render(): TemplateResult | void {
+    this._log("Render");
     // TODO Check for stateObj or other necessary things and render a warning if missing
     if (this.config.show_warning) {
       return this._showWarning(localize('common.show_warning'));
@@ -247,6 +232,13 @@ export class BannerCardExt extends LitElement {
   }
 
   private _renderEntities(): TemplateResult {
+    this._log("Parsing updated entities...");
+    // Parse new state values for _entities_
+    this.entityValues = (this.config.entities || [])
+        .filter((conf) => filterEntity(conf, this._hass.states))
+        .map((conf) => this._parseEntity(conf));
+    this._log("Rendering entities...")
+
     if (this.entityValues.length === 0) {
       return html``;
     }
