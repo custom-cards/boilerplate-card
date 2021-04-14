@@ -171,23 +171,32 @@ export class ExtendedBannerCard extends LitElement {
   }
 
   private _renderHeading(): TemplateResult {
-    let heading = this.config.name;
-    if (heading === false) {
+    const header = this.config.header;
+    if (!header) {
       return html``;
     }
 
-    if (!Array.isArray(heading)) {
-      heading = [heading];
+    if (!Array.isArray(header.title)) {
+      header.title = [header.title];
+    }
+
+    let fontSize = "var(--bc-font-size-heading)";
+    let margin = "var(--bc-margin-heading)";
+    let fontWeight = "300";
+    if (header.mini == true) {
+      fontSize = "var(--bc-font-size-heading-mini)";
+      margin = "var(--bc-margin-heading-mini)";
+      fontWeight = "400";
     }
 
     return html`
-      <h2 class="heading" style="color: ${this.config.color};"
-        @action=${(event) => this._handleAction(event, this.config)}
+      <h2 class="heading" style="color: ${this.config.color}; margin: ${margin}; font-size: ${fontSize}; font-weight: ${fontWeight}"
+        @action=${(event) => this._handleAction(event, header)}
         .actionHandler=${actionHandler({
-          hasHold: hasAction(this.config.hold_action),
-          hasDoubleClick: hasAction(this.config.double_tap_action),
+          hasHold: hasAction(header.hold_action),
+          hasDoubleClick: hasAction(header.double_tap_action),
         })}>
-        ${heading.map((fragment) => {
+        ${header.title.map((fragment) => {
       if (isIcon(fragment)) {
         return html`
               <ha-icon class="heading-icon" .icon="${fragment}"></ha-icon>
@@ -494,9 +503,11 @@ export class ExtendedBannerCard extends LitElement {
     return css`
   :host {
     --bc-font-size-heading: var(--banner-card-heading-size, 3em);
+    --bc-font-size-heading-mini: var(--banner-card-heading-size-mini, 2.3em);
     --bc-font-size-entity-value: var(--banner-card-entity-value-size, 1.5em);
     --bc-font-size-media-title: var(--banner-card-media-title-size, 0.9em);
     --bc-margin-heading: var(--banner-card-heading-margin, 1em);
+    --bc-margin-heading-mini: var(--banner-card-heading--mini, 0.6em);
     --bc-spacing: var(--banner-card-spacing, 4px);
     --bc-button-size: var(--banner-card-button-size, 32px);
     --bc-heading-color-dark: var(
@@ -526,9 +537,6 @@ export class ExtendedBannerCard extends LitElement {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: var(--bc-font-size-heading);
-    margin: var(--bc-margin-heading);
-    font-weight: 300;
     cursor: pointer;
   }
 
