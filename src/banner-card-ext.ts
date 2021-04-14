@@ -58,15 +58,11 @@ export class BannerCardExt extends LitElement {
 
   // TODO Add any properities that should cause your element to re-render here
   // https://lit-element.polymer-project.org/guide/properties
-  //@property({ attribute: false }) public hass!: HomeAssistant;
+  @property({ attribute: false }) public hass!: HomeAssistant;
   @internalProperty() private config!: BannerCardExtConfig;
   @internalProperty() private _hass!: HomeAssistant;
 
   private entityValues!: BannerCardExtConfigEntityConfig[];
-
-  set hass(hass) {
-    this._hass = hass;
-  }
 
   // https://lit-element.polymer-project.org/guide/properties#accessors-custom
   public setConfig(config: BannerCardExtConfig): void {
@@ -107,7 +103,7 @@ export class BannerCardExt extends LitElement {
   }
 
   private _parseEntity(config): BannerCardExtConfigEntityConfig {
-    const state = this._hass.states[config.entity];
+    const state = this.hass.states[config.entity];
     const attributes = state ? state.attributes : {};
 
     // Will either:
@@ -241,7 +237,7 @@ export class BannerCardExt extends LitElement {
     this._log("Parsing updated entities...");
     // Parse new state values for _entities_
     this.entityValues = (this.config.entities || [])
-        .filter((conf) => filterEntity(conf, this._hass.states))
+        .filter((conf) => filterEntity(conf, this.hass.states))
         .map((conf) => this._parseEntity(conf));
     this._log("Rendering entities...")
 
@@ -276,7 +272,7 @@ export class BannerCardExt extends LitElement {
           action: () => {
             const { service, ...serviceData } = config.action;
             const [domain, action] = service.split(".");
-            this._hass.callService(domain, action, {
+            this.hass.callService(domain, action, {
               entity_id: config.entity,
               ...serviceData,
             });
@@ -364,8 +360,8 @@ export class BannerCardExt extends LitElement {
   }
 
   private _handleAction(ev: ActionHandlerEvent): void {
-    if (this._hass && this.config && ev.detail.action) {
-      handleAction(this, this._hass, this.config, ev.detail.action);
+    if (this.hass && this.config && ev.detail.action) {
+      handleAction(this, this.hass, this.config, ev.detail.action);
     }
   }
 
