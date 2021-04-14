@@ -130,6 +130,12 @@ export class BannerCardExt extends LitElement {
       ...data,
       ...config,
       ...dynamicData,
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      tap_action: config.tap_action || {action: 'none'},
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      hold_action: config.tap_action || {action: 'none'},
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      double_tap_action: config.tap_action || {action: 'none'}
     };
   }
 
@@ -174,7 +180,12 @@ export class BannerCardExt extends LitElement {
     //TODO make actions
     //const onClick = () => this.config.link && this.navigate(this.config.link);
     return html`
-      <h2 class="heading" style="color: ${this.config.color};">
+      <h2 class="heading" style="color: ${this.config.color};"
+        @action=${(event) => this._handleAction(event, this.config)}
+        .actionHandler=${actionHandler({
+          hasHold: hasAction(this.config.hold_action),
+          hasDoubleClick: hasAction(this.config.double_tap_action),
+        })}>
         ${heading.map((fragment) => {
       if (isIcon(fragment)) {
         return html`
@@ -343,7 +354,7 @@ export class BannerCardExt extends LitElement {
     return html` <span class="entity-name">${name}</span> `;
   }
 
-  private _handleAction(ev: ActionHandlerEvent, conf: BannerCardExtConfigEntityConfig): void {
+  private _handleAction(ev: ActionHandlerEvent, conf: any): void {
     if (this.hass && this.config && ev.detail.action) {
       handleAction(this, this.hass, conf, ev.detail.action);
     }
