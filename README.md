@@ -1,6 +1,6 @@
 # Lovelace Banner Card Extended
 
-Base on powerful [Boilerplate card](https://github.com/custom-cards/boilerplate-card) example and beautiful [Banner card](https://github.com/nervetattoo/banner-card).
+Based on powerful [Boilerplate card](https://github.com/custom-cards/boilerplate-card) example and beautiful [Banner card](https://github.com/nervetattoo/banner-card).
 
 The same as Banner Card, but:
 * Supports regular [Lovelace actions](https://www.home-assistant.io/lovelace/actions/) on heading and each entity
