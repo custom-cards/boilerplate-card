@@ -21,7 +21,7 @@ import {
 
 import { hasConfigOrEntitiesChanged } from './has-changed';
 import type { BannerCardExtConfig, BannerCardExtConfigEntityConfig } from './types';
-import { parseEntity, getAttributeOrState, readableColor, isIcon } from "./utils";
+import { parseEntity, getAttributeOrState, readableColor, isIcon, createElement } from "./utils";
 import { actionHandler } from './action-handler-directive';
 import { CARD_VERSION } from './const';
 import { localize } from './localize/localize';
@@ -57,6 +57,10 @@ export class BannerCardExt extends LitElement {
   @internalProperty() private config!: BannerCardExtConfig;
 
   private entityValues!: BannerCardExtConfigEntityConfig[];
+
+  private _service(domain, action, entityId) {
+    return () => this.hass.callService(domain, action, { entityId });
+  }
 
   public setConfig(config: BannerCardExtConfig): void {
     this._log("Set config");
@@ -129,13 +133,7 @@ export class BannerCardExt extends LitElement {
     return {
       ...data,
       ...config,
-      ...dynamicData,
-      // eslint-disable-next-line @typescript-eslint/camelcase
-      tap_action: config.tap_action || {action: 'none'},
-      // eslint-disable-next-line @typescript-eslint/camelcase
-      hold_action: config.tap_action || {action: 'none'},
-      // eslint-disable-next-line @typescript-eslint/camelcase
-      double_tap_action: config.tap_action || {action: 'none'}
+      ...dynamicData
     };
   }
 
@@ -177,8 +175,6 @@ export class BannerCardExt extends LitElement {
       heading = [heading];
     }
 
-    //TODO make actions
-    //const onClick = () => this.config.link && this.navigate(this.config.link);
     return html`
       <h2 class="heading" style="color: ${this.config.color};"
         @action=${(event) => this._handleAction(event, this.config)}
@@ -198,10 +194,8 @@ export class BannerCardExt extends LitElement {
     `;
   }
 
-  //TODO add return type
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   private grid(index: any = 1) {
-    //TODO add return type
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     if (index === "full" || index > this.config.rowSize) {
@@ -260,9 +254,7 @@ export class BannerCardExt extends LitElement {
 
       // If an attribute is requested we assume not to render
       // any domain specifics
-      //TODO render custom elements
       if (!config.attribute) {
-        /*TODO render custom
         if (config.type && config.type.startsWith("custom:")) {
           const tag = config.type.split(":")[1];
           let customStyle = "";
@@ -274,11 +266,8 @@ export class BannerCardExt extends LitElement {
 
           return this.renderCustomElement(tag, config, customStyle);
         }
-        
-         */
        
       
-        /*TODO render domain-specific
         switch (config.domain) {
           case "light":
           case "switch":
@@ -290,7 +279,6 @@ export class BannerCardExt extends LitElement {
             return this.renderDomainMediaPlayer(config);
         }
         
-         */
       }
       return this._renderDomainDefault(config);
     })}
@@ -330,6 +318,109 @@ export class BannerCardExt extends LitElement {
     `;
   }
 
+  private renderCustomElement(tag, config, customStyle = ""): TemplateResult {
+    if (customElements.get(tag)) {
+      return html`
+      <div class="entity-state" style="${this.grid(config.size || "full")}"
+        @action=${(event) => this._handleAction(event, config)}
+        .actionHandler=${actionHandler({
+        hasHold: hasAction(config.hold_action),
+        hasDoubleClick: hasAction(config.double_tap_action),
+      })}>
+        <div class="entity-value">
+          <div class="entity-padded ${customStyle}">
+            ${createElement(tag, config, this.hass)}
+          </div>
+        </div>
+      </div>
+    `;
+    } else {
+      console.error(tag + " doesn't exist");
+      return html``;
+    }
+  }
+
+  private renderAsToggle(config): TemplateResult {
+    const color = config.color ? config.color : "var(--switch-checked-color)";
+    return html`
+      <div class="entity-state" style="${this.grid(config.size)}">
+        ${this._renderEntityName(config.name)}
+        <span class="entity-value">
+          <mwc-switch
+            style="--mdc-theme-secondary: ${color};"
+            ?checked=${config.state === "on"}
+            @click=${this._service(config.domain, "toggle", config.entity)}
+          >
+          </mwc-switch>
+        </span>
+      </div>
+    `;
+  }
+
+  private renderDomainMediaPlayer(config): TemplateResult {
+    const isPlaying = config.state === "playing";
+
+    const a = config.attributes;
+
+    const action = isPlaying ? "media_pause" : "media_play";
+
+    const mediaTitle = [a.media_artist, a.media_title].join(" – ");
+    return html`
+      <div class="entity-state" style="${this.grid(config.size || "full")}">
+        ${this._renderEntityName(config.name)}
+        <div class="entity-value">
+          <div class="entity-state-left media-title">${mediaTitle}</div>
+          <div class="entity-state-right media-controls">
+            <ha-icon-button
+              icon="mdi:skip-previous"
+              role="button"
+              @click=${this._service(config.domain, "media_previous_track", config.entity)}
+            ></ha-icon-button>
+            <ha-icon-button
+              icon="${isPlaying ? "mdi:stop" : "mdi:play"}"
+              role="button"
+              @click=${this._service(config.domain, action, config.entity)}
+            ></ha-icon-button>
+            <ha-icon-button
+              icon="mdi:skip-next"
+              role="button"
+              @click=${this._service(config.domain, "media_next_track", config.entity)}
+            ></ha-icon-button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  private renderDomainCover(config): TemplateResult {
+    const isclosed = config.state === "closed" || config.state === 0.0;
+    const isopen = config.state === "open" || config.state === 100.0;
+    return html`
+      <div class="entity-state" style="${this.grid(config.size)}">
+        ${this._renderEntityName(config.name)}
+        <span class="entity-value">
+          <ha-icon-button
+            ?disabled=${isopen}
+            icon="hass:arrow-up"
+            role="button"
+            @click=${this._service("cover", "open_cover", config.entity)}
+          ></ha-icon-button>
+          <ha-icon-button
+            icon="hass:stop"
+            role="button"
+            @click=${this._service("cover", "stop_cover", config.entity)}
+          ></ha-icon-button>
+          <ha-icon-button
+            ?disabled=${isclosed}
+            icon="hass:arrow-down"
+            role="button"
+            @click=${this._service("cover", "close_cover", config.entity)}
+          ></ha-icon-button>
+        </span>
+      </div>
+    `;
+  }
+
   private _renderValue(config, fallback): TemplateResult {
     if (config.icon || isIcon(config.value)) {
       const color = config.color ? `color: ${config.color}` : "";
@@ -355,6 +446,8 @@ export class BannerCardExt extends LitElement {
   }
 
   private _handleAction(ev: ActionHandlerEvent, conf: any): void {
+    this._log("Handling the event: " + ev.detail.action);
+    this._log(conf, true);
     if (this.hass && this.config && ev.detail.action) {
       handleAction(this, this.hass, conf, ev.detail.action);
     }

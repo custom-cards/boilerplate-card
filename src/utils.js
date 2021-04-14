@@ -21,6 +21,18 @@ export function mapObject(data, fn) {
   }, {});
 }
 
+export function createElement(tag, config, hass) {
+  const element = document.createElement(tag);
+
+  if (element.setConfig) {
+    element.setConfig(config);
+  }
+
+  element.hass = hass;
+
+  return element;
+}
+
 export function parseEntity(entity) {
   if (typeof entity === "object") {
     return mapObject(entity, value => {
