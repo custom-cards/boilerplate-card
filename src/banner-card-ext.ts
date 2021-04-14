@@ -313,7 +313,7 @@ export class BannerCardExt extends LitElement {
     `;*/
 
     return html`
-      <a class="entity-state" style="${this.grid(config.size)}"
+      <bce-entity class="entity-state" style="${this.grid(config.size)}"
         @action=${this._handleAction}
         .actionHandler=${actionHandler({
           hasHold: hasAction(config.hold_action),
@@ -321,7 +321,7 @@ export class BannerCardExt extends LitElement {
           })}>
         ${this._renderEntityName(config.name)}
         <span class="entity-value">${htmlContent}</span>
-      </a>
+      </bce-entity>
     `;
   }
 
