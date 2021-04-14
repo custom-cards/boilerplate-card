@@ -291,7 +291,10 @@ export class ExtendedBannerCard extends LitElement {
   private _renderDomainDefault(config): TemplateResult {
     const htmlContent = this._renderValue(
         config,
-        () => html` ${config.value} ${config.unit} `
+        () => {
+          const color = config.color ? `color: ${config.color}` : "";
+          return html`<span style="${color}">${config.value} ${config.unit}</span>`
+        }
     );
     /*return html`
       <ha-card
