@@ -151,12 +151,18 @@ export class BannerCardExt extends LitElement {
   // https://lit-element.polymer-project.org/guide/lifecycle#shouldupdate
   //TODO bring it back on update issues
   protected shouldUpdate(changedProps: PropertyValues): boolean {
-    this._log("Should update?");
+    let result = false;
     if (!this.config) {
-      return false;
+      result = false;
+    } else {
+      this._log("Checking entity states...");
+      this._log(this, true);
+      this._log(changedProps, true);
+      result = hasConfigOrEntitiesChanged(this, changedProps, false);
     }
 
-    return hasConfigOrEntitiesChanged(this, changedProps, false);
+    this._log("Should update: " + result);
+    return result;
   }
 
   // https://lit-element.polymer-project.org/guide/templates
