@@ -2,7 +2,7 @@ import { ActionConfig, EntityConfig, LovelaceCard, LovelaceCardConfig, LovelaceC
 
 declare global {
   interface HTMLElementTagNameMap {
-    'boilerplate-card-editor': LovelaceCardEditor;
+    'banner-card-ext-editor': LovelaceCardEditor;
     'hui-error-card': LovelaceCard;
   }
 }

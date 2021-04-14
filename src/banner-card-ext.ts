@@ -19,7 +19,7 @@ import {
   getLovelace,
 } from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types
 
-//TODO wtf? Take from original repository https://github.com/custom-cards/boilerplate-card
+//TODO editor. Original repository: https://github.com/custom-cards/boilerplate-card
 //import './editor';
 
 import { hasConfigOrEntitiesChanged } from './has-changed';
@@ -40,34 +40,29 @@ console.info(
 // This puts your card into the UI card picker dialog
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
-  type: 'boilerplate-card',
-  name: 'Boilerplate Card',
-  description: 'A template custom card for you to create something awesome',
+  type: 'banner-card-ext',
+  name: 'Banner Card Extended',
+  description: 'Banner Card refactored and improved',
 });
 
-// TODO Name your custom element
-@customElement('boilerplate-card')
+@customElement('banner-card-ext')
 export class BannerCardExt extends LitElement {
+
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
-    return document.createElement('boilerplate-card-editor');
+    return document.createElement('banner-card-ext-editor');
   }
 
   public static getStubConfig(): object {
     return {};
   }
 
-  // TODO Add any properities that should cause your element to re-render here
-  // https://lit-element.polymer-project.org/guide/properties
   @property({ attribute: false }) public hass!: HomeAssistant;
   @internalProperty() private config!: BannerCardExtConfig;
-  @internalProperty() private _hass!: HomeAssistant;
 
   private entityValues!: BannerCardExtConfigEntityConfig[];
 
-  // https://lit-element.polymer-project.org/guide/properties#accessors-custom
   public setConfig(config: BannerCardExtConfig): void {
     this._log("Set config");
-    // TODO Check for required fields and that they are of the proper format
     if (!config) {
       throw new Error(localize('common.invalid_configuration'));
     }
@@ -144,26 +139,18 @@ export class BannerCardExt extends LitElement {
     };
   }
 
-  // https://lit-element.polymer-project.org/guide/lifecycle#shouldupdate
-  //TODO bring it back on update issues
   protected shouldUpdate(changedProps: PropertyValues): boolean {
     let result = false;
     if (!this.config) {
       result = false;
     } else {
-      this._log("Checking entity states...");
-      this._log(this, true);
-      this._log(changedProps, true);
       result = hasConfigOrEntitiesChanged(this, changedProps, false);
     }
 
-    this._log("Should update: " + result);
     return result;
   }
 
-  // https://lit-element.polymer-project.org/guide/templates
   protected render(): TemplateResult | void {
-    this._log("Render");
     // TODO Check for stateObj or other necessary things and render a warning if missing
     if (this.config.show_warning) {
       return this._showWarning(localize('common.show_warning'));
@@ -173,21 +160,6 @@ export class BannerCardExt extends LitElement {
       return this._showError(localize('common.show_error'));
     }
 
-    /*
-    return html`
-      <ha-card
-        .header=${this.config.name}
-        @action=${this._handleAction}
-        .actionHandler=${actionHandler({
-          hasHold: hasAction(this.config.hold_action),
-          hasDoubleClick: hasAction(this.config.double_tap_action),
-        })}
-        tabindex="0"
-        .label=${`Boilerplate: ${this.config.entity || 'No Entity Defined'}`}
-      ></ha-card>
-    `;
-
-     */
     return html`
       <ha-card style="background: ${this.config.background};">
         ${this._renderHeading()} ${this._renderEntities()}
@@ -327,8 +299,26 @@ export class BannerCardExt extends LitElement {
         config,
         () => html` ${config.value} ${config.unit} `
     );
+    /*return html`
+      <ha-card
+        .header=${this.config.name}
+        @action=${this._handleAction}
+        .actionHandler=${actionHandler({
+          hasHold: hasAction(this.config.hold_action),
+          hasDoubleClick: hasAction(this.config.double_tap_action),
+        })}
+        tabindex="0"
+        .label=${`Boilerplate: ${this.config.entity || 'No Entity Defined'}`}
+      ></ha-card>
+    `;*/
+
     return html`
-      <a class="entity-state" style="${this.grid(config.size)}">
+      <a class="entity-state" style="${this.grid(config.size)}"
+        @action=${this._handleAction}
+        .actionHandler=${actionHandler({
+          hasHold: hasAction(config.hold_action),
+          hasDoubleClick: hasAction(config.double_tap_action),
+          })}>
         ${this._renderEntityName(config.name)}
         <span class="entity-value">${htmlContent}</span>
       </a>
