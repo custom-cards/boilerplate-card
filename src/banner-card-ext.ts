@@ -269,7 +269,7 @@ export class BannerCardExt extends LitElement {
           return this.renderCustomElement(tag, config, customStyle);
         }
         
-        if (config.domain in ["light", "switch", "input_boolean"] && config.toggle != false) {
+        if (["light", "switch", "input_boolean"].indexOf(config.domain) > -1 && config.toggle != false) {
           return this.renderAsToggle(config);
         } else if (config.domain == "cover") {
           return this.renderDomainCover(config);
