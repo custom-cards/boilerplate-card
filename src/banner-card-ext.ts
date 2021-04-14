@@ -58,8 +58,10 @@ export class BannerCardExt extends LitElement {
 
   private entityValues!: BannerCardExtConfigEntityConfig[];
 
-  private _service(domain, action, entityId) {
-    return () => this.hass.callService(domain, action, { entityId });
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  private _service(domain, action, entity_id) {
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    return () => this.hass.callService(domain, action, { entity_id });
   }
 
   public setConfig(config: BannerCardExtConfig): void {
