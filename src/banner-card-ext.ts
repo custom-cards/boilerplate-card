@@ -353,7 +353,7 @@ export class BannerCardExt extends LitElement {
     this._log("Handling action: " + ev.detail.action);
     this._log(ev, true);
     if (this.hass && this.config && ev.detail.action) {
-      handleAction(this, this.hass, this.config, ev.detail.action);
+      handleAction(this, this.hass, this.config.entities[0], ev.detail.action);
     }
   }
 
