@@ -19,7 +19,7 @@ header:
     mini: true
 ```
 ### Toggles
-`light`, `input_boolean` and `switch` are now rendered with icons by default, but you can still render toggles with `toggle: true` for entity configuration.
+`light`, `input_boolean` and `switch` are now rendered with text states by default, but you can still render toggles with `toggle: true` for entity configuration.
 ### Other improvements
 * Increased render performance
 * `color` could be applied to text state as well
