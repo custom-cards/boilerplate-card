@@ -45,9 +45,9 @@ console.info(
 @customElement('banner-card-ext')
 export class BannerCardExt extends LitElement {
 
-  public static async getConfigElement(): Promise<LovelaceCardEditor> {
+  /*public static async getConfigElement(): Promise<LovelaceCardEditor> {
     return document.createElement('banner-card-ext-editor');
-  }
+  }*/
 
   public static getStubConfig(): object {
     return {};
@@ -58,6 +58,10 @@ export class BannerCardExt extends LitElement {
 
   private entityValues!: BannerCardExtConfigEntityConfig[];
 
+  public getCardSize(): number {
+    return 3;
+  }
+
   // eslint-disable-next-line @typescript-eslint/camelcase
   private _service(domain, action, entity_id) {
     // eslint-disable-next-line @typescript-eslint/camelcase
@@ -65,7 +69,6 @@ export class BannerCardExt extends LitElement {
   }
 
   public setConfig(config: BannerCardExtConfig): void {
-    this._log("Set config");
     if (!config) {
       throw new Error(localize('common.invalid_configuration'));
     }
@@ -207,12 +210,10 @@ export class BannerCardExt extends LitElement {
   }
 
   private _renderEntities(): TemplateResult {
-    this._log("Parsing updated entities...");
     // Parse new state values for _entities_
     this.entityValues = (this.config.entities || [])
         .filter((conf) => filterEntity(conf, this.hass.states))
         .map((conf) => this._parseEntity(conf));
-    this._log("Rendering entities...")
 
     if (this.entityValues.length === 0) {
       return html``;
@@ -270,6 +271,7 @@ export class BannerCardExt extends LitElement {
         }
         
         if (["light", "switch", "input_boolean"].indexOf(config.domain) > -1 && config.toggle != false) {
+          this._log(config.entity + "should be rendered as toggle, because domain = " + config.domain + " and toggle = " + config.toggle);
           return this.renderAsToggle(config);
         } else if (config.domain == "cover") {
           return this.renderDomainCover(config);
