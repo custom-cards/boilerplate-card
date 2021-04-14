@@ -370,7 +370,7 @@ export class BannerCardExt extends LitElement {
   }
 
   private _log(message: any, raw = false): void {
-    if (this.config.debug) {
+    if (this.config?.debug) {
       if (raw) {
         console.log(message);
       } else {
