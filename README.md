@@ -1,5 +1,5 @@
 # Lovelace Extended Banner Card
-## `type: 'custom:extended-banner-card'`
+
 Based on powerful [Boilerplate card](https://github.com/custom-cards/boilerplate-card) example and beautiful [Banner card](https://github.com/nervetattoo/banner-card).
 
 The same as Banner Card, but
@@ -18,8 +18,8 @@ header:
         ...
     mini: true
 ```
+### Toggles
+`light`, `input_boolean` and `switch` are now rendered with icons by default, but you can still render toggles with `toggle: true` for entity configuration.
 ### Other improvements
-* Increased performance (Doesn't render itself on each state change of every entity on your server. Updates only on state change of the entities in the configuration)
-* `name` should be used instead of `heading`
-* Use `toggle: true` to render `light`, `input_boolean` or `switch` as toggle
+* Increased render performance
 * `color` could be applied to text state as well
