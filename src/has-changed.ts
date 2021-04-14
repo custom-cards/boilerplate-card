@@ -17,7 +17,7 @@ export function hasConfigOrEntitiesChanged(
         if (item.entity) {
             //TODO change _hass to hass after rendering improvements
             const oldHass = changedProps.get('_hass') as HomeAssistant | undefined;
-            if (oldHass && oldHass.states[item.entity] !== element.hass?.states[item.entity]) {
+            if (oldHass && oldHass.states[item.entity] !== element._hass?.states[item.entity]) {
                 someItemChanged = true;
             }
         }
