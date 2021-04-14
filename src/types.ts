@@ -27,6 +27,7 @@ export interface BannerCardExtConfigEntityConfig extends EntityConfig {
   domain: any;
   attribute?: any;
   error?: any;
+  toggle?: boolean;
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
   double_tap_action?: ActionConfig;
