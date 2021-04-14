@@ -118,9 +118,7 @@ export class BannerCardExt extends LitElement {
     // Will either:
     // set .value to be the key from entities.*.map_value.{key} that matches the current `state` if the value is a string
     // or set all values as dynamicData if it is an object
-    const dynamicData = {
-      value: undefined
-    };
+    let dynamicData: any;
     
     if (config.map_state && state.state in config.map_state) {
       this._log("Mapped state found for sate " + state.state);
@@ -130,10 +128,11 @@ export class BannerCardExt extends LitElement {
       const mapStateType = typeof mappedState;
       this._log(mapStateType);
       if (mapStateType === "string") {
-        dynamicData.value = mappedState;
+        dynamicData = {value: mappedState};
         this._log("Mapped state is string");
       } else if (mapStateType === "object") {
         this._log("Mapped state is object");
+        dynamicData = {};
         Object.entries(mappedState).forEach(([key, val]) => {
           dynamicData[key] = val;
         });
