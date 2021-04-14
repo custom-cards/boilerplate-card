@@ -1,7 +1,7 @@
 {
-  "name": "banner-card-ext",
+  "name": "extended-banner-card",
   "version": "1.3.2",
-  "description": "Lovelace banner-card extended",
+  "description": "Lovelace extended banner card",
   "keywords": [
     "home-assistant",
     "homeassistant",
@@ -10,8 +10,8 @@
     "lovelace",
     "custom-cards"
   ],
-  "module": "banner-card-ext.js",
-  "repository": "git@github.com:estevez-dev/banner-card-ext.git",
+  "module": "extended-banner-card.js",
+  "repository": "git@github.com:estevez-dev/extended-banner-card.git",
   "author": "Yegor Vialov <vyalov.egor@gmail.com>",
   "license": "MIT",
   "dependencies": {

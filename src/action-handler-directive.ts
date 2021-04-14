@@ -161,15 +161,15 @@ class ActionHandler extends HTMLElement implements ActionHandler {
   }
 }
 
-customElements.define('action-handler-banner-card-ext', ActionHandler);
+customElements.define('action-handler-ext-banner-card', ActionHandler);
 
 const getActionHandler = (): ActionHandler => {
   const body = document.body;
-  if (body.querySelector('action-handler-banner-card-ext')) {
-    return body.querySelector('action-handler-banner-card-ext') as ActionHandler;
+  if (body.querySelector('action-handler-ext-banner-card')) {
+    return body.querySelector('action-handler-ext-banner-card') as ActionHandler;
   }
 
-  const actionhandler = document.createElement('action-handler-banner-card-ext');
+  const actionhandler = document.createElement('action-handler-ext-banner-card');
   body.appendChild(actionhandler);
 
   return actionhandler as ActionHandler;
