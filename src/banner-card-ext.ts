@@ -270,8 +270,9 @@ export class BannerCardExt extends LitElement {
           return this.renderCustomElement(tag, config, customStyle);
         }
         
-        if (["light", "switch", "input_boolean"].indexOf(config.domain) > -1 && config.toggle != false) {
+        if (["light", "switch", "input_boolean"].indexOf(config.domain) > -1 && config.toggle == true) {
           this._log(config.entity + "should be rendered as toggle, because domain = " + config.domain + " and toggle = " + config.toggle);
+          this._log(config, true);
           return this.renderAsToggle(config);
         } else if (config.domain == "cover") {
           return this.renderDomainCover(config);
