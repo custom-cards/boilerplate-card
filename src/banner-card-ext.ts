@@ -342,14 +342,17 @@ export class BannerCardExt extends LitElement {
 
   private renderAsToggle(config): TemplateResult {
     const color = config.color ? config.color : "var(--switch-checked-color)";
-    return html`
-      <div class="entity-state" style="${this.grid(config.size)}">
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    return html`<div class="entity-state" style="${this.grid(config.size)}" @action=${(event) => this._handleAction(event, { ...config, tap_action: {action: "toggle"}})}
+        .actionHandler=${actionHandler({
+          hasHold: hasAction(config.hold_action),
+          hasDoubleClick: hasAction(config.double_tap_action),
+        })}>
         ${this._renderEntityName(config.name)}
         <span class="entity-value">
           <mwc-switch
             style="--mdc-theme-secondary: ${color};"
             ?checked=${config.state === "on"}
-            @click=${this._service(config.domain, "toggle", config.entity)}
           >
           </mwc-switch>
         </span>
