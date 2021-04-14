@@ -111,6 +111,7 @@ export class BannerCardExt extends LitElement {
   }
 
   private _parseEntity(config): BannerCardExtConfigEntityConfig {
+    this._log("----------------- parsing " + config.entity);
     const state = this._hass.states[config.entity];
     const attributes = state ? state.attributes : {};
 
@@ -122,11 +123,9 @@ export class BannerCardExt extends LitElement {
     };
     
     if (config.map_state && state.state in config.map_state) {
-      this._log("-----------------------------------");
-      this._log("Mapped state found for " + config.entity);
+      this._log("Mapped state found for sate " + state.state);
       const mappedState = config.map_state[state.state];
-      this._log("Current state " + state.state);
-      this._log(mappedState);
+      this._log(mappedState, true);
       this._log("Mapped state type:");
       const mapStateType = typeof mappedState;
       this._log(mapStateType);
@@ -138,8 +137,6 @@ export class BannerCardExt extends LitElement {
         Object.entries(mappedState).forEach(([key, val]) => {
           dynamicData[key] = val;
         });
-      } else {
-        this._log("Mapped state is what??");
       }
     }
 
@@ -155,6 +152,12 @@ export class BannerCardExt extends LitElement {
     if (attributes.hasOwnProperty("current_position")) {
       data.state = attributes.current_position;
     }
+
+    this._log("Entity data: data, config, dynamicData:")
+    this._log(data, true);
+    this._log(config, true);
+    this._log(dynamicData, true);
+    this._log("----------------- end");
 
     return {
       ...data,
@@ -375,9 +378,13 @@ export class BannerCardExt extends LitElement {
     `;
   }
 
-  private _log(message: string): void {
+  private _log(message: any, raw = false): void {
     if (this.config.debug) {
-      console.log("[banner-card-ex] " + message);
+      if (raw) {
+        console.log(message);
+      } else {
+        console.log("[banner-card-ex] " + message);
+      }
     }
   }
 
