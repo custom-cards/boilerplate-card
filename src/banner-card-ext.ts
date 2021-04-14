@@ -19,9 +19,6 @@ import {
   getLovelace,
 } from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types
 
-//TODO editor. Original repository: https://github.com/custom-cards/boilerplate-card
-//import './editor';
-
 import { hasConfigOrEntitiesChanged } from './has-changed';
 import type { BannerCardExtConfig, BannerCardExtConfigEntityConfig } from './types';
 import { parseEntity, getAttributeOrState, readableColor, isIcon } from "./utils";
@@ -101,9 +98,6 @@ export class BannerCardExt extends LitElement {
     const state = this.hass.states[config.entity];
     const attributes = state ? state.attributes : {};
 
-    // Will either:
-    // set .value to be the key from entities.*.map_value.{key} that matches the current `state` if the value is a string
-    // or set all values as dynamicData if it is an object
     let dynamicData: any;
     
     if (config.map_state && state.state in config.map_state) {
@@ -140,7 +134,7 @@ export class BannerCardExt extends LitElement {
   }
 
   protected shouldUpdate(changedProps: PropertyValues): boolean {
-    let result = false;
+    let result;
     if (!this.config) {
       result = false;
     } else {
@@ -314,7 +308,7 @@ export class BannerCardExt extends LitElement {
 
     return html`
       <a class="entity-state" style="${this.grid(config.size)}"
-        @action=${this._handleAction}
+        @action=${(event) => this._handleAction(event, config)}
         .actionHandler=${actionHandler({
           hasHold: hasAction(config.hold_action),
           hasDoubleClick: hasAction(config.double_tap_action),
@@ -349,11 +343,9 @@ export class BannerCardExt extends LitElement {
     return html` <span class="entity-name">${name}</span> `;
   }
 
-  private _handleAction(ev: ActionHandlerEvent): void {
-    this._log("Handling action: " + ev.detail.action);
-    this._log(ev, true);
+  private _handleAction(ev: ActionHandlerEvent, conf: BannerCardExtConfigEntityConfig): void {
     if (this.hass && this.config && ev.detail.action) {
-      handleAction(this, this.hass, this.config.entities[0], ev.detail.action);
+      handleAction(this, this.hass, conf, ev.detail.action);
     }
   }
 
