@@ -10,7 +10,7 @@ Supports regular [Lovelace actions](https://www.home-assistant.io/lovelace/actio
 ```yaml
 header:
     title:
-        - mdi:sofa
+        - mdi:television
         - Living Room
     tap_action:
         ...
