@@ -4,6 +4,8 @@
 
 Based on powerful [Boilerplate card](https://github.com/custom-cards/boilerplate-card) example and beautiful [Banner card](https://github.com/nervetattoo/banner-card).
 
+![Example](/screenshots/screenshot.png)
+
 ## Main differences
 ### Actions
 Supports regular [Lovelace actions](https://www.home-assistant.io/lovelace/actions/) on the header and each entity
