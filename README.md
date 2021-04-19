@@ -20,6 +20,10 @@ header:
 ```
 ### Toggles
 `light`, `input_boolean` and `switch` are now rendered with text states by default, but you can still render toggles with `toggle: true` for entity configuration.
+### Media player
+* Default `tap_action` is `more-info`
+* Actions are handled on name and media title elements
+* Skip buttons replaced with volume controls
 ### Other improvements
 * Increased render performance
 * `color` could be applied to text state as well
