@@ -69,6 +69,7 @@ Could be a list of string entity ids, or a map with:
 | Key | Type | Description |
 | --- | --- | --- |
 | entity | _string_ | Entity ID |
+| value | _string_ | The text or MDI icon to show as state |
 | unit | _string_ | Override for units of measurement |
 | name | _string_ | Override for entity name |
 | attribute | _string_ | The name of an attribute to display instead of the state |
