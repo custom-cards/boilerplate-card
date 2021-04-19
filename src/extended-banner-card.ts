@@ -21,7 +21,7 @@ import {
 
 import { hasConfigOrEntitiesChanged } from './has-changed';
 import type { ExtendedBannerCardConfig, ExtendedBannerCardEntityConfig } from './types';
-import { parseEntity, getAttributeOrState, readableColor, isIcon, createElement } from "./utils";
+import { parseEntity, readableColor, isIcon, createElement } from "./utils";
 import { actionHandler } from './action-handler-directive';
 import { CARD_VERSION } from './const';
 import { localize } from './localize/localize';
@@ -107,17 +107,33 @@ export class ExtendedBannerCard extends LitElement {
     const state = this.hass.states[config.entity];
     const attributes = state ? state.attributes : {};
 
-    let dynamicData: any;
+    let dynamicStateData: any;
     
     if (config.map_state && state.state in config.map_state) {
       const mappedState = config.map_state[state.state];
       const mapStateType = typeof mappedState;
       if (mapStateType === "string") {
-        dynamicData = {value: mappedState};
+        dynamicStateData = {value: mappedState};
       } else if (mapStateType === "object") {
-        dynamicData = {};
+        dynamicStateData = {};
         Object.entries(mappedState).forEach(([key, val]) => {
-          dynamicData[key] = val;
+          dynamicStateData[key] = val;
+        });
+      }
+    }
+
+    let dynamicAttrData: any;
+
+    if (config.map_attribute && typeof config.attribute === "string" && attributes[config.attribute] in config.map_attribute) {
+      const attrValue = attributes[config.attribute];
+      const mappedAttr = config.map_attribute[attrValue];
+      const mapAttrType = typeof mappedAttr;
+      if (mapAttrType === "string") {
+        dynamicAttrData = {value: mappedAttr};
+      } else if (mapAttrType === "object") {
+        dynamicAttrData = {};
+        Object.entries(mappedAttr).forEach(([key, val]) => {
+          dynamicAttrData[key] = val;
         });
       }
     }
@@ -125,7 +141,8 @@ export class ExtendedBannerCard extends LitElement {
     const data = {
       name: attributes.friendly_name,
       state: state ? state.state : "",
-      value: getAttributeOrState(state || {}, config.attribute),
+      value: typeof config.attribute === "string" &&
+        attributes.hasOwnProperty(config.attribute) ? attributes[config.attribute] : state.state,
       unit: attributes.unit_of_measurement,
       attributes,
       domain: config.entity ? config.entity.split(".")[0] : undefined,
@@ -138,7 +155,8 @@ export class ExtendedBannerCard extends LitElement {
     return {
       ...data,
       ...config,
-      ...dynamicData
+      ...dynamicStateData,
+      ...dynamicAttrData
     };
   }
 

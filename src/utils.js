@@ -1,11 +1,3 @@
-// Helper to return an attribute if specified and present,
-// if not the value of state
-export function getAttributeOrState({ state, attributes }, attribute = false) {
-  if (typeof attribute === "string" && attributes.hasOwnProperty(attribute)) {
-    return attributes[attribute];
-  }
-  return state;
-}
 
 const ICON_REGEXP = /^(mdi|hass):/;
 export function isIcon(value) {
