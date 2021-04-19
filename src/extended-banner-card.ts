@@ -382,33 +382,40 @@ export class ExtendedBannerCard extends LitElement {
 
     const mediaTitle = [a.media_artist, a.media_title].join(" – ");
     if (!config.tap_action) {
-      config.tap_action = {action: 'more-info'};
+      config['tap_action'] = {action: 'more-info'};
     }
     return html`
-      <div class="entity-state" style="${this.grid(config.size || "full")}"
-        @action=${(event) => this._handleAction(event, config)}
-        .actionHandler=${actionHandler({
-          hasHold: hasAction(config.hold_action),
-          hasDoubleClick: hasAction(config.double_tap_action),
-        })}>
-        ${this._renderEntityName(config.name)}
+      <div class="entity-state" style="${this.grid(config.size || "full")}">
+        <div
+          @action=${(event) => this._handleAction(event, config)}
+          .actionHandler=${actionHandler({
+            hasHold: hasAction(config.hold_action),
+            hasDoubleClick: hasAction(config.double_tap_action),
+          })}>
+            ${this._renderEntityName(config.name)}
+          </div>
         <div class="entity-value">
-          <div class="entity-state-left media-title">${mediaTitle}</div>
+          <div class="entity-state-left media-title"
+          @action=${(event) => this._handleAction(event, config)}
+          .actionHandler=${actionHandler({
+            hasHold: hasAction(config.hold_action),
+            hasDoubleClick: hasAction(config.double_tap_action),
+          })}>${mediaTitle}</div>
           <div class="entity-state-right media-controls">
             <ha-icon-button
-              icon="mdi:skip-previous"
+              icon="mdi:volume-minus"
               role="button"
-              @click=${this._service(config.domain, "media_previous_track", config.entity)}
+              @click=${this._service(config.domain, "volume_down", config.entity)}
             ></ha-icon-button>
             <ha-icon-button
-              icon="${isPlaying ? "mdi:stop" : "mdi:play"}"
+              icon="${isPlaying ? "mdi:pause" : "mdi:play"}"
               role="button"
               @click=${this._service(config.domain, action, config.entity)}
             ></ha-icon-button>
             <ha-icon-button
-              icon="mdi:skip-next"
+              icon="mdi:volume-plus"
               role="button"
-              @click=${this._service(config.domain, "media_next_track", config.entity)}
+              @click=${this._service(config.domain, "volume_up", config.entity)}
             ></ha-icon-button>
           </div>
         </div>
