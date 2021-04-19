@@ -337,9 +337,9 @@ export class ExtendedBannerCard extends LitElement {
       <div class="entity-state" style="${this.grid(config.size || "full")}"
         @action=${(event) => this._handleAction(event, config)}
         .actionHandler=${actionHandler({
-        hasHold: hasAction(config.hold_action),
-        hasDoubleClick: hasAction(config.double_tap_action),
-      })}>
+          hasHold: hasAction(config.hold_action),
+          hasDoubleClick: hasAction(config.double_tap_action),
+        })}>
         <div class="entity-value">
           <div class="entity-padded ${customStyle}">
             ${createElement(tag, config, this.hass)}
@@ -381,8 +381,16 @@ export class ExtendedBannerCard extends LitElement {
     const action = isPlaying ? "media_pause" : "media_play";
 
     const mediaTitle = [a.media_artist, a.media_title].join(" – ");
+    if (!config.tap_action) {
+      config.tap_action = {action: 'more-info'};
+    }
     return html`
-      <div class="entity-state" style="${this.grid(config.size || "full")}">
+      <div class="entity-state" style="${this.grid(config.size || "full")}"
+        @action=${(event) => this._handleAction(event, config)}
+        .actionHandler=${actionHandler({
+          hasHold: hasAction(config.hold_action),
+          hasDoubleClick: hasAction(config.double_tap_action),
+        })}>
         ${this._renderEntityName(config.name)}
         <div class="entity-value">
           <div class="entity-state-left media-title">${mediaTitle}</div>
