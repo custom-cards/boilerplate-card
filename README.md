@@ -75,6 +75,7 @@ Could be a list of string entity ids, or a map with:
 | image | _boolean_ | Set to `true` to force value displaying as a rounded image |
 | tap_action | _map_ | See [Lovelace Tap-Action](https://www.home-assistant.io/lovelace/actions/#tap-action) |
 | hold_action | _map_ | See [Lovelace Hold-Action](https://www.home-assistant.io/lovelace/actions/#hold-action) |
+| toggle | _boolean_ | Set to `true` to render `light`, `switch` or `input_boolean` as a toggle |
 
 ### State mapping
 
