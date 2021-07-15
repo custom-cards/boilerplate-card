@@ -275,7 +275,9 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
     }
     if (target.configValue) {
       if (target.value === '') {
-        delete this._config[target.configValue];
+        const tmpConfig = {...this._config};
+        delete tmpConfig[target.configValue];
+        this._config = tmpConfig;
       } else {
         this._config = {
           ...this._config,
