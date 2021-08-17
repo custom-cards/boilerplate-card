@@ -1,18 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/camelcase */
-import {
-  LitElement,
-  html,
-  customElement,
-  property,
-  TemplateResult,
-  CSSResult,
-  css,
-  internalProperty,
-} from 'lit-element';
+import { LitElement, html, TemplateResult, css, CSSResultGroup } from 'lit';
 import { HomeAssistant, fireEvent, LovelaceCardEditor, ActionConfig } from 'custom-card-helpers';
 
 import { BoilerplateCardConfig } from './types';
+import { customElement, property, state } from 'lit/decorators';
 
 const options = {
   required: {
@@ -58,9 +50,9 @@ const options = {
 @customElement('boilerplate-card-editor')
 export class BoilerplateCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass?: HomeAssistant;
-  @internalProperty() private _config?: BoilerplateCardConfig;
-  @internalProperty() private _toggle?: boolean;
-  @internalProperty() private _helpers?: any;
+  @state() private _config?: BoilerplateCardConfig;
+  @state() private _toggle?: boolean;
+  @state() private _helpers?: any;
   private _initialized = false;
 
   public setConfig(config: BoilerplateCardConfig): void {
@@ -275,7 +267,7 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
     }
     if (target.configValue) {
       if (target.value === '') {
-        const tmpConfig = {...this._config};
+        const tmpConfig = { ...this._config };
         delete tmpConfig[target.configValue];
         this._config = tmpConfig;
       } else {
@@ -288,7 +280,7 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
-  static get styles(): CSSResult {
+  static get styles(): CSSResultGroup {
     return css`
       .option {
         padding: 4px 0px;

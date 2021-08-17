@@ -2,14 +2,12 @@
 import {
   LitElement,
   html,
-  customElement,
-  property,
-  CSSResult,
   TemplateResult,
   css,
   PropertyValues,
-  internalProperty,
-} from 'lit-element';
+  CSSResultGroup,
+} from 'lit';
+import { customElement, property, state } from "lit/decorators";
 import {
   HomeAssistant,
   hasConfigOrEntityChanged,
@@ -56,7 +54,8 @@ export class BoilerplateCard extends LitElement {
   // TODO Add any properities that should cause your element to re-render here
   // https://lit-element.polymer-project.org/guide/properties
   @property({ attribute: false }) public hass!: HomeAssistant;
-  @internalProperty() private config!: BoilerplateCardConfig;
+
+  @state() private config!: BoilerplateCardConfig;
 
   // https://lit-element.polymer-project.org/guide/properties#accessors-custom
   public setConfig(config: BoilerplateCardConfig): void {
@@ -135,7 +134,7 @@ export class BoilerplateCard extends LitElement {
   }
 
   // https://lit-element.polymer-project.org/guide/styles
-  static get styles(): CSSResult {
+  static get styles(): CSSResultGroup {
     return css``;
   }
 }
