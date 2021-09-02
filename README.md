@@ -47,7 +47,7 @@ Hey dude! Help me out for a couple of :beers: or a :coffee:!
 
 ### Step 1
 
-Clone this repository
+Click the "Use this template" button on the main page and clone the new repository to your machine
 
 ### Step 2
 
