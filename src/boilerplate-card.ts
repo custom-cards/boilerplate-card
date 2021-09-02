@@ -16,7 +16,8 @@ import {
   handleAction,
   LovelaceCardEditor,
   getLovelace,
-} from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types
+} from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types. https://github.com/custom-cards/custom-card-helpers
+
 
 import './editor';
 
@@ -52,12 +53,12 @@ export class BoilerplateCard extends LitElement {
   }
 
   // TODO Add any properities that should cause your element to re-render here
-  // https://lit-element.polymer-project.org/guide/properties
+  // https://lit.dev/docs/components/properties/
   @property({ attribute: false }) public hass!: HomeAssistant;
 
   @state() private config!: BoilerplateCardConfig;
 
-  // https://lit-element.polymer-project.org/guide/properties#accessors-custom
+  // https://lit.dev/docs/components/properties/#accessors-custom
   public setConfig(config: BoilerplateCardConfig): void {
     // TODO Check for required fields and that they are of the proper format
     if (!config) {
@@ -74,7 +75,7 @@ export class BoilerplateCard extends LitElement {
     };
   }
 
-  // https://lit-element.polymer-project.org/guide/lifecycle#shouldupdate
+  // https://lit.dev/docs/components/lifecycle/#reactive-update-cycle-performing
   protected shouldUpdate(changedProps: PropertyValues): boolean {
     if (!this.config) {
       return false;
@@ -83,7 +84,7 @@ export class BoilerplateCard extends LitElement {
     return hasConfigOrEntityChanged(this, changedProps, false);
   }
 
-  // https://lit-element.polymer-project.org/guide/templates
+  // https://lit.dev/docs/components/rendering/
   protected render(): TemplateResult | void {
     // TODO Check for stateObj or other necessary things and render a warning if missing
     if (this.config.show_warning) {
@@ -133,7 +134,7 @@ export class BoilerplateCard extends LitElement {
     `;
   }
 
-  // https://lit-element.polymer-project.org/guide/styles
+  // https://lit.dev/docs/components/styles/
   static get styles(): CSSResultGroup {
     return css``;
   }
