@@ -48,7 +48,7 @@ export class BoilerplateCard extends LitElement {
     return document.createElement('boilerplate-card-editor');
   }
 
-  public static getStubConfig(): object {
+  public static getStubConfig(): Record<string, unknown> {
     return {};
   }
 
