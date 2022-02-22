@@ -145,5 +145,8 @@ export class BoilerplateCardEditor extends ScopedRegistryHost(LitElement) implem
     mwc-formfield {
       padding-bottom: 8px;
     }
+    mwc-switch {
+      --mdc-theme-secondary: var(--switch-checked-color);
+    }
   `;
 }
