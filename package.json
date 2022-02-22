@@ -26,7 +26,7 @@
     "@material/mwc-textfield": "^0.25.3",
     "custom-card-helpers": "^1.7.2",
     "home-assistant-js-websocket": "^5.11.1",
-    "lit": "^2.0.0-rc.2"
+    "lit": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
@@ -49,6 +49,12 @@
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.30.0",
     "typescript": "^4.4.3"
+  },
+  "resolutions": {
+    "lit": "^2.1.2",
+    "lit-html": "2.1.2",
+    "lit-element": "3.1.2",
+    "@lit/reactive-element": "1.2.1"
   },
   "scripts": {
     "start": "rollup -c rollup.config.dev.js --watch",

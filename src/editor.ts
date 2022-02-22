@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LitElement, html, TemplateResult, css, CSSResultGroup } from 'lit';
-import { HomeAssistant, fireEvent, LovelaceCardEditor, LovelaceConfig } from 'custom-card-helpers';
+import { HomeAssistant, fireEvent, LovelaceCardEditor } from 'custom-card-helpers';
 
+import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import { BoilerplateCardConfig } from './types';
 import { customElement, property, state } from 'lit/decorators';
-import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import { formfieldDefinition } from '../elements/formfield';
 import { selectDefinition } from '../elements/select';
 import { switchDefinition } from '../elements/switch';
@@ -12,7 +12,6 @@ import { textfieldDefinition } from '../elements/textfield';
 
 @customElement('boilerplate-card-editor')
 export class BoilerplateCardEditor extends ScopedRegistryHost(LitElement) implements LovelaceCardEditor {
-  lovelace?: LovelaceConfig | undefined;
   @property({ attribute: false }) public hass?: HomeAssistant;
 
   @state() private _config?: BoilerplateCardConfig;
@@ -21,14 +20,12 @@ export class BoilerplateCardEditor extends ScopedRegistryHost(LitElement) implem
 
   private _initialized = false;
 
-  static get elementDefinitions() {
-    return {
-      ...textfieldDefinition,
-      ...selectDefinition,
-      ...switchDefinition,
-      ...formfieldDefinition,
-    };
-  }
+  static elementDefinitions = {
+    ...textfieldDefinition,
+    ...selectDefinition,
+    ...switchDefinition,
+    ...formfieldDefinition,
+  };
 
   public setConfig(config: BoilerplateCardConfig): void {
     this._config = config;
@@ -139,16 +136,14 @@ export class BoilerplateCardEditor extends ScopedRegistryHost(LitElement) implem
     fireEvent(this, 'config-changed', { config: this._config });
   }
 
-  static get styles(): CSSResultGroup {
-    return css`
-      mwc-select,
-      mwc-textfield {
-        margin-bottom: 16px;
-        display: block;
-      }
-      mwc-formfield {
-        padding-bottom: 8px;
-      }
-    `;
-  }
+  static styles: CSSResultGroup = css`
+    mwc-select,
+    mwc-textfield {
+      margin-bottom: 16px;
+      display: block;
+    }
+    mwc-formfield {
+      padding-bottom: 8px;
+    }
+  `;
 }
