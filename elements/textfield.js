@@ -1,4 +1,4 @@
-import { TextFieldBase } from '@material/mwc-textfield/mwc-textfield-base';
+import { TextFieldBase } from '@material/mwc-textfield/mwc-textfield-base.js';
 import { NotchedOutlineBase } from '@material/mwc-notched-outline/mwc-notched-outline-base';
 
 import { styles as textfieldStyles } from '@material/mwc-textfield/mwc-textfield.css';
@@ -16,3 +16,5 @@ export const textfieldDefinition = {
     }
   },
 };
+
+export const ignoreTextfieldFiles = ['@material/mwc-notched-outline/mwc-notched-outline.js'];

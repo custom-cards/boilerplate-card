@@ -1,9 +1,10 @@
-import { SelectBase } from '@material/mwc-select/mwc-select-base';
-import { ListBase } from '@material/mwc-list/mwc-list-base';
-import { ListItemBase } from '@material/mwc-list/mwc-list-item-base';
-import { MenuBase } from '@material/mwc-menu/mwc-menu-base';
-import { MenuSurfaceBase } from '@material/mwc-menu/mwc-menu-surface-base';
-import { RippleBase } from '@material/mwc-ripple/mwc-ripple-base';
+import { SelectBase } from '@material/mwc-select/mwc-select-base.js';
+import { ListBase } from '@material/mwc-list/mwc-list-base.js';
+import { ListItemBase } from '@material/mwc-list/mwc-list-item-base.js';
+import { MenuBase } from '@material/mwc-menu/mwc-menu-base.js';
+import { MenuSurfaceBase } from '@material/mwc-menu/mwc-menu-surface-base.js';
+import { RippleBase } from '@material/mwc-ripple/mwc-ripple-base.js';
+import { NotchedOutlineBase } from '@material/mwc-notched-outline/mwc-notched-outline-base.js';
 
 import { styles as selectStyles } from '@material/mwc-select/mwc-select.css';
 import { styles as listStyles } from '@material/mwc-list/mwc-list.css';
@@ -11,6 +12,7 @@ import { styles as listItemStyles } from '@material/mwc-list//mwc-list-item.css'
 import { styles as rippleStyles } from '@material/mwc-ripple/mwc-ripple.css';
 import { styles as menuStyles } from '@material/mwc-menu/mwc-menu.css';
 import { styles as menuSurfaceStyles } from '@material/mwc-menu/mwc-menu-surface.css';
+import { styles as notchedOutlineStyles } from '@material/mwc-notched-outline/mwc-notched-outline.css';
 
 export const selectDefinition = {
   'mwc-select': class extends SelectBase {
@@ -43,4 +45,18 @@ export const selectDefinition = {
       return menuSurfaceStyles;
     }
   },
+  'mwc-notched-outline': class extends NotchedOutlineBase {
+    static get styles() {
+      return notchedOutlineStyles;
+    }
+  },
 };
+
+export const ignoreSelectFiles = [
+  '@material/mwc-ripple/mwc-ripple.js',
+  '@material/mwc-menu/mwc-menu.js',
+  '@material/mwc-menu/mwc-menu-surface.js',
+  '@material/mwc-list/mwc-list.js',
+  '@material/mwc-list/mwc-list-item.js',
+  '@material/mwc-icon/mwc-icon.js',
+];
