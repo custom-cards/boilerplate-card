@@ -3,7 +3,7 @@
   "name": "Boilerplate Card Development",
   "image": "ludeeus/container:monster",
   "context": "..",
-  "appPort": ["5000:5000", "9123:8123"],
+  "appPort": ["5001:5001", "9123:8123"],
   "postCreateCommand": "npm install",
   "runArgs": [
     "-v",
