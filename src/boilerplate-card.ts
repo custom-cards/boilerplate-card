@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  LitElement,
-  html,
-  TemplateResult,
-  css,
-  PropertyValues,
-  CSSResultGroup,
-} from 'lit';
-import { customElement, property, state } from "lit/decorators";
+import { LitElement, html, TemplateResult, css, PropertyValues, CSSResultGroup } from 'lit';
+import { customElement, property, state } from 'lit/decorators';
 import {
   HomeAssistant,
   hasConfigOrEntityChanged,
@@ -17,9 +10,6 @@ import {
   LovelaceCardEditor,
   getLovelace,
 } from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types. https://github.com/custom-cards/custom-card-helpers
-
-
-import './editor';
 
 import type { BoilerplateCardConfig } from './types';
 import { actionHandler } from './action-handler-directive';
@@ -45,6 +35,7 @@ console.info(
 @customElement('boilerplate-card')
 export class BoilerplateCard extends LitElement {
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
+    await import('./editor');
     return document.createElement('boilerplate-card-editor');
   }
 
@@ -116,9 +107,7 @@ export class BoilerplateCard extends LitElement {
   }
 
   private _showWarning(warning: string): TemplateResult {
-    return html`
-      <hui-warning>${warning}</hui-warning>
-    `;
+    return html` <hui-warning>${warning}</hui-warning> `;
   }
 
   private _showError(error: string): TemplateResult {
@@ -129,9 +118,7 @@ export class BoilerplateCard extends LitElement {
       origConfig: this.config,
     });
 
-    return html`
-      ${errorCard}
-    `;
+    return html` ${errorCard} `;
   }
 
   // https://lit.dev/docs/components/styles/
