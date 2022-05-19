@@ -49,9 +49,12 @@ export class BoilerplateCard extends LitElement {
 
   @state() private config!: BoilerplateCardConfig;
 
+  private _error = '';
+
   // https://lit.dev/docs/components/properties/#accessors-custom
   public setConfig(config: BoilerplateCardConfig): void {
     // TODO Check for required fields and that they are of the proper format
+    console.info('setConfig');
     if (!config) {
       throw new Error(localize('common.invalid_configuration'));
     }
@@ -75,8 +78,24 @@ export class BoilerplateCard extends LitElement {
     return hasConfigOrEntityChanged(this, changedProps, false);
   }
 
+  public async performUpdate(): Promise<void> {
+    console.info('performUpdate');
+    this._error = '';
+    Object.keys(this.config).forEach(key => {
+      console.info(key.match(/_entity$/) !== null)
+      if (key.match(/_entity$/) !== null) {
+        if (this.hass.states[this.config[key]] === undefined) {
+          this._error += `'${key}=${this.config[key]}' not found`;
+        }
+      }
+    })
+    super.performUpdate();
+  }
+
   // https://lit.dev/docs/components/rendering/
   protected render(): TemplateResult | void {
+    console.info('render');
+    if (this._error !== '') return this._showConfigWarning(this._error);
     // TODO Check for stateObj or other necessary things and render a warning if missing
     if (this.config.show_warning) {
       return this._showWarning(localize('common.show_warning'));
@@ -104,6 +123,20 @@ export class BoilerplateCard extends LitElement {
     if (this.hass && this.config && ev.detail.action) {
       handleAction(this, this.hass, this.config, ev.detail.action);
     }
+  }
+
+  private _showConfigWarning(warning: string): TemplateResult {
+    // const errorCard = <LovelaceCard>document.createElement('hui-error-card');
+    // eslint-disable-next-line no-console
+    console.log(warning);
+    return html`
+      <hui-warning
+        ><div>
+          ERROR:<br />
+          ${warning}
+        </div></hui-warning
+      >
+    `;
   }
 
   private _showWarning(warning: string): TemplateResult {
