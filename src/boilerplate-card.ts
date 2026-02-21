@@ -2,29 +2,37 @@ import { LitElement, html, TemplateResult, css, PropertyValues, CSSResultGroup }
 import { customElement, property, state } from 'lit/decorators.js';
 import { HassEntity } from 'home-assistant-js-websocket';
 import {
-  HomeAssistant,
-  hasConfigOrEntityChanged,
-  hasAction,
-  ActionHandlerEvent,
-  handleAction,
-  LovelaceCardEditor,
-  computeIcon,
-  computeName,
-  computeState,
-  formatTimestamp,
-} from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types. https://github.com/custom-cards/custom-card-helpers
+  HomeAssistant, // The main hass object — passed down from HA on every state change
+  hasConfigOrEntityChanged, // Utility: returns true only when config or the tracked entity changed
+  hasAction, // Utility: returns true when an ActionConfig is not 'none'
+  ActionHandlerEvent, // Event type fired by the action-handler directive
+  handleAction, // Utility: routes an action (toggle, more-info, navigate…) to the right HA call
+  LovelaceCardEditor, // Interface your editor element must implement
+  computeIcon, // Derives the MDI icon for an entity (falls back to domain default)
+  computeName, // Derives the friendly_name for an entity
+  computeState, // Returns the human-readable state string (respects unit_of_measurement)
+  formatTimestamp, // Converts an ISO timestamp to a human-friendly relative string
+} from 'custom-card-helpers'; // Community-maintained helpers: https://github.com/custom-cards/custom-card-helpers
+
+// TODO: Replace this import with your own config type once you've defined your fields in types.ts.
 import type { BoilerplateCardConfig } from './types';
+
+// Local action-handler directive — provides tap / hold / double-tap gesture support.
 import { actionHandler } from './action-handler-directive';
 import { CARD_VERSION } from './const';
 import { localize } from './localize/localize';
 
+// Styled console banner so your card is easy to spot in the browser console.
+// Stays visible in production — useful for version-mismatch debugging in HA.
 console.info(
   `%c  BOILERPLATE-CARD \n%c  ${localize('common.version')} ${CARD_VERSION}    `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );
 
-// This puts your card into the UI card picker dialog
+// Registering with window.customCards makes your card appear in the Lovelace
+// "Add Card" UI picker with a name and description. This array is shared by all
+// custom cards on the page, so we guard with `|| []` before pushing.
 interface WindowWithCustomCards extends Window {
   customCards: Array<{ type: string; name: string; description: string }>;
 }
@@ -32,14 +40,23 @@ interface WindowWithCustomCards extends Window {
 (window as unknown as WindowWithCustomCards).customCards =
   (window as unknown as WindowWithCustomCards).customCards || [];
 (window as unknown as WindowWithCustomCards).customCards.push({
+  // TODO: Change 'boilerplate-card' to match your @customElement decorator name.
   type: 'boilerplate-card',
+  // TODO: Give your card a user-facing name and description.
   name: 'Boilerplate Card',
   description: 'A template custom card for you to create something awesome',
 });
 
-// TODO Name your custom element
+// TODO: Rename 'boilerplate-card' to your card's unique tag name.
+// Convention: all lowercase, hyphen-separated, and prefixed to avoid clashes
+// e.g. 'my-weather-card'. Must match the `type:` in your YAML config and the
+// window.customCards entry above.
 @customElement('boilerplate-card')
 export class BoilerplateCard extends LitElement {
+  // getConfigElement is called by HA when the user opens the visual editor.
+  // The dynamic import keeps the editor code out of the main bundle — it is only
+  // loaded when actually needed, improving initial load time.
+  // TODO: If you rename your editor element in editor.ts, update the tag name below.
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     try {
       await import('./editor');
@@ -51,23 +68,45 @@ export class BoilerplateCard extends LitElement {
     }
   }
 
+  // getStubConfig returns a minimal valid config used when the user adds your
+  // card from the picker without going through the editor first.
+  // TODO: Add your required fields here so the card doesn't throw on first render.
+  // Example: return { entity: 'light.living_room' };
   public static getStubConfig(): Record<string, unknown> {
     return {};
   }
 
-  // TODO Add any properities that should cause your element to re-render here
-  // https://lit.dev/docs/components/properties/
+  // `hass` is set by HA on every state change anywhere in the system.
+  // `attribute: false` means it is set as a JS property, not an HTML attribute
+  // (the object is too large to serialize as an attribute).
+  // Lit will schedule a re-render whenever this property reference changes.
   @property({ attribute: false }) public hass!: HomeAssistant;
 
+  // `config` is private internal state set via setConfig().
+  // Using @state (instead of @property) means it won't be exposed as a public
+  // property but will still trigger re-renders when it changes.
   @state() private config!: BoilerplateCardConfig;
 
+  // setConfig is called by HA whenever the YAML config changes (including from
+  // the visual editor). It runs before the element is connected to the DOM, so
+  // you can't access `this.hass` here — it may not be set yet.
+  //
+  // Good practices:
+  //   • Throw an Error for truly invalid configs (HA will surface it as an error card).
+  //   • Spread defaults first, then the user config on top — this lets users omit
+  //     optional fields without your render() code needing null-checks everywhere.
+  //   • Never call async operations here; use connectedCallback or firstUpdated instead.
+  //
   // https://lit.dev/docs/components/properties/#accessors-custom
   public setConfig(config: BoilerplateCardConfig): void {
-    // TODO Check for required fields and that they are of the proper format
+    // TODO: Validate required fields. For example:
+    //   if (!config.entity) throw new Error('You must provide an entity.');
     if (!config) {
       throw new Error(localize('common.invalid_configuration'));
     }
 
+    // Merge defaults with the user-supplied config.
+    // TODO: Add your own defaults here for any optional config fields.
     this.config = {
       name: 'Boilerplate',
       layout: 'vertical',
@@ -76,6 +115,23 @@ export class BoilerplateCard extends LitElement {
     };
   }
 
+  // shouldUpdate is a performance gate — return false to skip rendering.
+  //
+  // `hasConfigOrEntityChanged` returns true when:
+  //   • `config` changed, OR
+  //   • the hass state for `config.entity` changed.
+  //
+  // This prevents unnecessary re-renders on every hass update (which fires for
+  // every entity state change in the entire system, not just yours).
+  //
+  // TODO: If your card tracks multiple entities, replace this with a custom check
+  // that watches all of them. Example:
+  //
+  //   if (!changedProps.has('hass')) return changedProps.has('config');
+  //   const oldHass = changedProps.get('hass') as HomeAssistant;
+  //   if (!oldHass) return true; // first hass update — always render
+  //   return ['sensor.a', 'sensor.b'].some(id => oldHass.states[id] !== this.hass.states[id]);
+  //
   // https://lit.dev/docs/components/lifecycle/#reactive-update-cycle-performing
   protected shouldUpdate(changedProps: PropertyValues): boolean {
     if (!this.config) {
@@ -85,9 +141,21 @@ export class BoilerplateCard extends LitElement {
     return hasConfigOrEntityChanged(this, changedProps, false);
   }
 
+  // render() is called by Lit whenever shouldUpdate() returns true.
+  // It must be a pure function of `this.config` and `this.hass` — no side effects.
+  //
+  // Pattern used here:
+  //   1. Guard clauses first (loading / error states) — bail out early.
+  //   2. Derive everything you need from config/hass into local consts.
+  //   3. Return a single html`` template at the end.
+  //
+  // Returning `void` (or nothing) renders nothing; HA won't show an error.
+  // Use `_showWarning` / `_showError` to surface problems to the user instead.
+  //
   // https://lit.dev/docs/components/rendering/
   protected render(): TemplateResult | void {
-    // TODO Check for stateObj or other necessary things and render a warning if missing
+    // TODO: Add any card-specific guards here — e.g. check for a required
+    // config field before trying to use it.
     if (this.config.show_warning) {
       return this._showWarning(localize('common.show_warning'));
     }
@@ -96,7 +164,8 @@ export class BoilerplateCard extends LitElement {
       return this._showError(localize('common.show_error'));
     }
 
-    // Skeleton while hass hasn't loaded yet
+    // `hass` is set asynchronously after the element is created.
+    // Showing a skeleton avoids a flash of broken content on first load.
     if (!this.hass) {
       return this._renderSkeleton();
     }
@@ -118,8 +187,8 @@ export class BoilerplateCard extends LitElement {
     const actionHandlerConfig = {
       hasHold: hasAction(this.config.hold_action),
       hasDoubleClick: hasAction(this.config.double_tap_action),
-      repeat: (this.config.hold_action as any)?.repeat,
-      repeatLimit: (this.config.hold_action as any)?.repeat_limit,
+      repeat: this.config.hold_action?.repeat,
+      repeatLimit: this.config.hold_action?.repeat_limit,
       isMomentary: !!(this.config.press_action || this.config.release_action),
       disableKbd: false,
     };
@@ -194,6 +263,9 @@ export class BoilerplateCard extends LitElement {
     `;
   }
 
+  // _renderContent separates layout logic from the main render() method.
+  // Splitting complex templates into private helper methods keeps render()
+  // readable at a glance. Each helper should have a single responsibility.
   private _renderContent(stateObj: HassEntity): TemplateResult {
     const isHorizontal = this.config.layout === 'horizontal';
     const isMinimal = this.config.card_style === 'minimal';
@@ -244,12 +316,25 @@ export class BoilerplateCard extends LitElement {
     `;
   }
 
+  // _handleAction is wired to the `@action` DOM event emitted by the
+  // action-handler directive. `handleAction` from custom-card-helpers reads
+  // ev.detail.action ('tap' | 'hold' | 'double_tap') and executes whichever
+  // ActionConfig the user configured (navigate, more-info, call-service, etc.).
+  //
+  // TODO: You can intercept specific actions here before delegating, e.g.
+  //   if (ev.detail.action === 'tap') { /* custom tap logic */ return; }
   private _handleAction(ev: ActionHandlerEvent): void {
     if (this.hass && this.config && ev.detail.action) {
       handleAction(this, this.hass, this.config, ev.detail.action);
     }
   }
 
+  // _handleEntityClick demonstrates direct service calls without going through
+  // the configured tap_action. It shows how to branch on entity domain and call
+  // the appropriate HA service.
+  //
+  // In a real card you'd typically rely on handleAction() with tap_action instead
+  // of writing domain-specific logic here — this is for educational purposes.
   private _handleEntityClick(ev: Event): void {
     ev.stopPropagation();
     if (!this.config.entity || !this.hass) return;
@@ -322,8 +407,16 @@ export class BoilerplateCard extends LitElement {
     return html` ${errorCard} `;
   }
 
+  // _renderAttributes shows a filtered subset of entity attributes.
+  //
+  // Why filter? `stateObj.attributes` can contain dozens of keys (HA internals,
+  // integration-specific data, etc.). Displaying everything would be noisy.
+  //
+  // TODO: Replace `importantAttrs` with the attributes relevant to your card's
+  // domain, or make the list configurable via `config.attribute_config`.
   private _renderAttributes(stateObj: HassEntity, limit = 3): TemplateResult {
     if (limit === 0) return html``;
+    // TODO: Adjust this list to match the attributes your card cares about.
     const importantAttrs = ['battery_level', 'temperature', 'humidity', 'brightness', 'volume_level'];
     const attrs = Object.entries(stateObj.attributes)
       .filter(([key, _]) => importantAttrs.includes(key))
@@ -348,6 +441,17 @@ export class BoilerplateCard extends LitElement {
     `;
   }
 
+  // _renderActionButtons exists purely to demonstrate the different action
+  // mechanisms available in HA custom cards. In a production card you would
+  // replace (or remove) this section with domain-appropriate controls.
+  //
+  // The four patterns shown:
+  //   1. `_showMoreInfo`  — fires the hass-more-info event (HA's built-in detail dialog)
+  //   2. `_navigate`      — pushes a path to the HA router
+  //   3. Domain buttons   — directly call HA services via `hass.callService`
+  //   4. `_handleDemoServiceCall` — creates a persistent notification via service call
+  //
+  // TODO: Remove or replace this method with the controls your card actually needs.
   private _renderActionButtons(stateObj: HassEntity): TemplateResult {
     return html`
       <div class="action-buttons">
@@ -454,6 +558,14 @@ export class BoilerplateCard extends LitElement {
     return actions.length > 0 ? actions.join(', ') : 'None configured';
   }
 
+  // Styles are encapsulated inside the Shadow DOM — they cannot leak out and
+  // external page styles cannot leak in (except for CSS custom properties).
+  //
+  // Use HA's CSS custom properties (e.g. `--primary-color`, `--divider-color`)
+  // so your card automatically adapts to the user's chosen theme.
+  // Full property list: https://github.com/home-assistant/frontend/blob/dev/src/resources/ha-style.ts
+  //
+  // TODO: Replace the demo styles below with styles for your own card layout.
   // https://lit.dev/docs/components/styles/
   static get styles(): CSSResultGroup {
     return css`
