@@ -11,13 +11,7 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
 
   @state() private _config?: BoilerplateCardConfig;
 
-  @state() private _helpers?: any;
-
   @state() private _openSection = 'entity';
-
-  constructor() {
-    super();
-  }
 
   private _configValueTarget(
     ev: Event,
