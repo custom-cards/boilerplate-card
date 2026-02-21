@@ -20,7 +20,7 @@
     "@lit-labs/motion": "1.0.7",
     "@lit-labs/observers": "2.0.2",
     "@lit-labs/virtualizer": "2.0.12",
-    "custom-card-helpers": "file:custom-card-helpers-1.9.1.tgz",
+    "custom-card-helpers": "2.0.0",
     "home-assistant-js-websocket": "9.6.0",
     "lit": "^3.3.2"
   },
@@ -50,9 +50,7 @@
     "lint": "eslint src/*.ts",
     "rollup": "rollup -c"
   },
-  "resolutions": {
-    "lit": "3.3.2",
+  "overrides": {
     "@lit/reactive-element": "1.6.3"
-  },
-  "packageManager": "yarn@4.2.2"
+  }
 }
