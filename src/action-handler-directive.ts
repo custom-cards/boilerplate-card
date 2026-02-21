@@ -1,28 +1,9 @@
-import { ActionHandlerDetail } from 'custom-card-helpers/dist/types';
+import { ActionHandlerDetail, ActionHandlerOptions } from 'custom-card-helpers/dist/types';
 import { directive, Directive, ElementPart, PartInfo } from 'lit/directive.js';
-import { deepEqual } from 'custom-card-helpers';
+import { deepEqual, fireEvent } from 'custom-card-helpers';
 
-// Extended ActionHandlerOptions for button-card compatibility
-interface ActionHandlerOptions {
-  hasHold?: boolean;
-  hasDoubleClick?: boolean;
-  repeat?: number;
-  repeatLimit?: number;
-  isMomentary?: boolean;
-  disableKbd?: boolean;
-  disabled?: boolean;
-}
-
-// Alternative fireEvent implementation as fallback
-const customFireEvent = (node: HTMLElement, type: string, detail: Record<string, unknown>) => {
-  const event = new CustomEvent(type, {
-    detail,
-    bubbles: true,
-    composed: true,
-    cancelable: false,
-  });
-  node.dispatchEvent(event);
-};
+const customFireEvent = (node: HTMLElement, type: string, detail: Record<string, unknown>) =>
+  fireEvent(node, type as any, detail);
 
 const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || (navigator as any).msMaxTouchPoints > 0;
 
@@ -278,13 +259,13 @@ const setupActionHandlerMethods = (element: HTMLElement): ActionHandler => {
 
 const getActionHandler = (): ActionHandler => {
   const body = document.body;
-  const existing = body.querySelector('.action-handler-boilerplate-card');
+  const existing = body.querySelector('.action-handler-boilerplate-card'); // TODO You need to update this name to be unique for your card
   if (existing) {
     return existing as ActionHandler;
   }
 
   const div = document.createElement('div');
-  div.className = 'action-handler-boilerplate-card';
+  div.className = 'action-handler-boilerplate-card'; // TODO You need to update this name to be unique for your card
   div.style.position = 'absolute';
   div.style.width = isTouch ? '100px' : '50px';
   div.style.height = isTouch ? '100px' : '50px';
