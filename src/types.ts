@@ -24,6 +24,9 @@ export interface BoilerplateCardConfig extends LovelaceCardConfig {
   // Appearance
   card_style?: 'default' | 'compact' | 'detailed' | 'minimal';
   accent_color?: [number, number, number]; // RGB array [r, g, b]
+  // Layout
+  layout?: 'vertical' | 'horizontal';
+  display_mode?: 'card' | 'badge';
   // Display
   attribute_limit?: number;
 }

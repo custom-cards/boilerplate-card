@@ -70,6 +70,8 @@ export class BoilerplateCard extends LitElement {
 
     this.config = {
       name: 'Boilerplate',
+      layout: 'vertical',
+      display_mode: 'card',
       ...config,
     };
   }
@@ -94,17 +96,25 @@ export class BoilerplateCard extends LitElement {
       return this._showError(localize('common.show_error'));
     }
 
-    const stateObj = this.config.entity ? this.hass.states[this.config.entity] : undefined;
+    // Skeleton while hass hasn't loaded yet
+    if (!this.hass) {
+      return this._renderSkeleton();
+    }
 
     if (!this.config.entity) {
       return this._showError('No entity defined');
     }
 
+    const stateObj = this.hass.states[this.config.entity];
     if (!stateObj) {
       return this._showError(`Entity not found: ${this.config.entity}`);
     }
 
-    // Log action handler configuration
+    // Badge / chip mode — no ha-card wrapper
+    if (this.config.display_mode === 'badge') {
+      return this._renderBadge(stateObj);
+    }
+
     const actionHandlerConfig = {
       hasHold: hasAction(this.config.hold_action),
       hasDoubleClick: hasAction(this.config.double_tap_action),
@@ -115,50 +125,122 @@ export class BoilerplateCard extends LitElement {
     };
 
     const accentColor = this.config.accent_color;
-    const cardStyle = accentColor
+    const inlineStyle = accentColor
       ? `--card-accent-color: rgb(${accentColor[0]},${accentColor[1]},${accentColor[2]});`
       : '';
+    const layoutClass = `layout-${this.config.layout || 'vertical'}`;
+    const styleClass = `style-${this.config.card_style || 'default'}`;
+
+    // Horizontal: suppress ha-card header — content fills the whole row
+    const cardHeader = this.config.layout === 'horizontal' ? undefined : this.config.name;
 
     return html`
       <ha-card
-        .header=${this.config.name}
+        .header=${cardHeader}
         @action=${this._handleAction}
         ${actionHandler(actionHandlerConfig)}
         .config=${this.config}
         tabindex="0"
         .label=${`Boilerplate: ${this.config.entity}`}
-        class="clickable-card style-${this.config.card_style || 'default'}"
-        style=${cardStyle}
+        class="clickable-card ${styleClass} ${layoutClass}"
+        style=${inlineStyle}
       >
-        <div class="card-content">
-          <div class="entity-row clickable-row" @click=${this._handleEntityClick}>
-            <div class="icon">
-              <ha-icon .icon=${computeIcon(stateObj, this.config.icon)}></ha-icon>
-            </div>
-            <div class="entity-info">
-              <div class="name">${computeName(stateObj)}</div>
-              <div class="state">${computeState(stateObj)}</div>
-            </div>
-            <div class="entity-actions">
-              <div class="toggle-hint">Tap to toggle</div>
-            </div>
-          </div>
-
-          ${this._renderAttributes(stateObj, this.config.attribute_limit ?? 3)}
-          ${this.config.card_style !== 'minimal' ? this._renderActionButtons(stateObj) : ''}
-          ${this.config.show_timestamps !== false
-            ? html` <div class="timestamps">
-                <div class="last-changed"><strong>Last Changed:</strong> ${formatTimestamp(stateObj.last_changed)}</div>
-                <div class="last-updated"><strong>Last Updated:</strong> ${formatTimestamp(stateObj.last_updated)}</div>
-              </div>`
-            : ''}
-        </div>
+        ${this._renderContent(stateObj)}
         <ha-ripple
           .disabled=${!hasAction(this.config.tap_action) &&
           !hasAction(this.config.hold_action) &&
           !hasAction(this.config.double_tap_action)}
         ></ha-ripple>
       </ha-card>
+    `;
+  }
+
+  private _renderSkeleton(): TemplateResult {
+    return html`
+      <ha-card>
+        <div class="card-content skeleton-content">
+          <div class="skeleton-row">
+            <div class="skeleton skeleton-icon"></div>
+            <div class="skeleton-text-block">
+              <div class="skeleton skeleton-name"></div>
+              <div class="skeleton skeleton-state"></div>
+            </div>
+          </div>
+          <div class="skeleton skeleton-attr"></div>
+          <div class="skeleton skeleton-attr skeleton-attr--short"></div>
+        </div>
+      </ha-card>
+    `;
+  }
+
+  private _renderBadge(stateObj: HassEntity): TemplateResult {
+    const accentColor = this.config.accent_color;
+    const inlineStyle = accentColor
+      ? `--card-accent-color: rgb(${accentColor[0]},${accentColor[1]},${accentColor[2]});`
+      : '';
+    return html`
+      <div
+        class="badge"
+        style=${inlineStyle}
+        @click=${this._handleEntityClick}
+        role="button"
+        tabindex="0"
+        aria-label=${`${computeName(stateObj)}: ${computeState(stateObj)}`}
+      >
+        <ha-icon class="badge-icon" .icon=${computeIcon(stateObj, this.config.icon)}></ha-icon>
+        <span class="badge-name">${computeName(stateObj)}</span>
+        <span class="badge-state">${computeState(stateObj)}</span>
+      </div>
+    `;
+  }
+
+  private _renderContent(stateObj: HassEntity): TemplateResult {
+    const isHorizontal = this.config.layout === 'horizontal';
+    const isMinimal = this.config.card_style === 'minimal';
+
+    if (isHorizontal) {
+      // Single compact row: icon · name+state · spacer · action buttons
+      return html`
+        <div class="card-content horizontal-strip">
+          <div class="icon">
+            <ha-icon .icon=${computeIcon(stateObj, this.config.icon)}></ha-icon>
+          </div>
+          <div class="entity-info">
+            <div class="name">${this.config.name ?? computeName(stateObj)}</div>
+            <div class="state">${computeState(stateObj)}</div>
+          </div>
+          <div class="horizontal-actions">${this._renderActionButtons(stateObj)}</div>
+        </div>
+      `;
+    }
+
+    // Vertical (default) — stacked sections
+    const entityRow = html`
+      <div class="entity-row clickable-row" @click=${this._handleEntityClick}>
+        <div class="icon">
+          <ha-icon .icon=${computeIcon(stateObj, this.config.icon)}></ha-icon>
+        </div>
+        <div class="entity-info">
+          <div class="name">${computeName(stateObj)}</div>
+          <div class="state">${computeState(stateObj)}</div>
+        </div>
+        <div class="entity-actions"><div class="toggle-hint">Tap to toggle</div></div>
+      </div>
+    `;
+
+    return html`
+      <div class="card-content">
+        ${entityRow} ${!isMinimal ? this._renderAttributes(stateObj, this.config.attribute_limit ?? 3) : ''}
+        ${!isMinimal ? this._renderActionButtons(stateObj) : ''}
+        ${this.config.show_timestamps !== false
+          ? html`
+              <div class="timestamps">
+                <div class="last-changed"><strong>Last Changed:</strong> ${formatTimestamp(stateObj.last_changed)}</div>
+                <div class="last-updated"><strong>Last Updated:</strong> ${formatTimestamp(stateObj.last_updated)}</div>
+              </div>
+            `
+          : ''}
+      </div>
     `;
   }
 
@@ -654,20 +736,159 @@ export class BoilerplateCard extends LitElement {
         margin-bottom: 0;
       }
 
-      /* Responsive design for smaller screens */
+      /* ── Horizontal layout ────────────────────────────────── */
+      .layout-horizontal {
+        --ha-card-border-radius: var(--ha-card-border-radius, 12px);
+      }
+      .horizontal-strip {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+      }
+      .horizontal-strip .icon {
+        margin-right: 0;
+        flex-shrink: 0;
+      }
+      .horizontal-strip .entity-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .horizontal-strip .name,
+      .horizontal-strip .state {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .horizontal-strip .horizontal-actions {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+      }
+      .horizontal-strip .action-buttons {
+        margin: 0;
+        padding: 0;
+        background: none;
+        border: none;
+      }
+      .horizontal-strip .action-section h4,
+      .horizontal-strip .action-hints {
+        display: none;
+      }
+
+      /* ── Badge / chip mode ───────────────────────────────────── */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px 4px 6px;
+        border-radius: 999px;
+        background: var(--card-background-color);
+        border: 1px solid var(--divider-color);
+        cursor: pointer;
+        font-size: 13px;
+        transition:
+          box-shadow 0.15s ease,
+          background 0.15s ease;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .badge:hover {
+        box-shadow: var(--shadow-elevation-4dp, 0 2px 6px rgba(0, 0, 0, 0.18));
+        background: var(--secondary-background-color);
+      }
+      .badge:active {
+        box-shadow: none;
+      }
+      .badge-icon {
+        --mdc-icon-size: 18px;
+        color: var(--card-accent-color, var(--state-icon-color));
+      }
+      .badge-name {
+        font-weight: 500;
+        color: var(--primary-text-color);
+      }
+      .badge-state {
+        color: var(--secondary-text-color);
+      }
+
+      /* ── Skeleton / loading UI ───────────────────────────────── */
+      @keyframes skeleton-pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+      .skeleton {
+        border-radius: 4px;
+        background: var(--divider-color);
+        animation: skeleton-pulse 1.4s ease-in-out infinite;
+      }
+      .skeleton-content {
+        pointer-events: none;
+      }
+      .skeleton-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      .skeleton-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .skeleton-text-block {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .skeleton-name {
+        height: 16px;
+        width: 55%;
+      }
+      .skeleton-state {
+        height: 13px;
+        width: 35%;
+      }
+      .skeleton-attr {
+        height: 12px;
+        width: 80%;
+        margin-bottom: 8px;
+      }
+      .skeleton-attr--short {
+        width: 55%;
+      }
+
+      /* ── Theme-aware CSS custom properties ───────────────────── */
+      :host {
+        --card-accent-color: var(--primary-color);
+      }
+
+      /* ── Responsive ─────────────────────────────────────────── */
       @media (max-width: 600px) {
         .action-button {
           font-size: 11px;
           padding: 6px 10px;
         }
-
         .entity-row {
           margin-bottom: 12px;
         }
-
         .action-buttons {
           margin: 12px 0;
           padding: 12px;
+        }
+        .horizontal-strip {
+          flex-wrap: wrap;
+        }
+        .horizontal-strip .horizontal-actions {
+          width: 100%;
+          justify-content: flex-start;
         }
       }
     `;
