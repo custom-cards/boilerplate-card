@@ -1,27 +1,29 @@
-import resolve from 'rollup-plugin-node-resolve';
-import typescript from 'rollup-plugin-typescript2';
-import babel from 'rollup-plugin-babel';
+import resolve from '@rollup/plugin-node-resolve';
+import typescript from '@rollup/plugin-typescript';
 import serve from 'rollup-plugin-serve';
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 import json from '@rollup/plugin-json';
-import ignore from './rollup-plugins/ignore';
-import { ignoreTextfieldFiles } from './elements/ignore/textfield';
-import { ignoreSelectFiles } from './elements/ignore/select';
-import { ignoreSwitchFiles } from './elements/ignore/switch';
+
+const onwarn = (warning, warn) => {
+  if (warning.code === 'THIS_IS_UNDEFINED' && warning.id?.includes('/node_modules/')) {
+    return;
+  }
+
+  warn(warning);
+};
 
 export default {
   input: ['src/boilerplate-card.ts'],
   output: {
     dir: './dist',
     format: 'es',
+    inlineDynamicImports: true,
+    entryFileNames: '[name].js', // Generates boilerplate-card.js without hash
   },
   plugins: [
     resolve(),
     typescript(),
     json(),
-    babel({
-      exclude: 'node_modules/**',
-    }),
     terser(),
     serve({
       contentBase: './dist',
@@ -29,11 +31,15 @@ export default {
       port: 5000,
       allowCrossOrigin: true,
       headers: {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': '*'
       },
     }),
-    ignore({
-      files: [...ignoreTextfieldFiles, ...ignoreSelectFiles, ...ignoreSwitchFiles].map((file) => require.resolve(file)),
-    }),
   ],
+  watch: {
+    include: 'src/**',
+    exclude: 'node_modules/**',
+    polling: 2000, // Poll every 2000ms for file changes (slower but more reliable on docker mounts)
+    debounce: 500, // Wait 500ms after last change before rebuilding
+  },
+  onwarn,
 };

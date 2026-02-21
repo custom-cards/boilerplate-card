@@ -1,152 +1,253 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LitElement, html, TemplateResult, css, CSSResultGroup } from 'lit';
-import { HomeAssistant, fireEvent, LovelaceCardEditor } from 'custom-card-helpers';
+import { LitElement, html, TemplateResult, css } from 'lit';
+import { HomeAssistant, fireEvent, LovelaceCardEditor, ActionConfig } from 'custom-card-helpers';
 
-import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import { BoilerplateCardConfig } from './types';
-import { customElement, property, state } from 'lit/decorators';
-import { formfieldDefinition } from '../elements/formfield';
-import { selectDefinition } from '../elements/select';
-import { switchDefinition } from '../elements/switch';
-import { textfieldDefinition } from '../elements/textfield';
+import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement('boilerplate-card-editor')
-export class BoilerplateCardEditor extends ScopedRegistryHost(LitElement) implements LovelaceCardEditor {
-  @property({ attribute: false }) public hass?: HomeAssistant;
+export class BoilerplateCardEditor extends LitElement implements LovelaceCardEditor {
+  @property({ attribute: false }) public hass!: HomeAssistant;
 
   @state() private _config?: BoilerplateCardConfig;
 
   @state() private _helpers?: any;
 
-  private _initialized = false;
+  constructor() {
+    super();
+  }
 
-  static elementDefinitions = {
-    ...textfieldDefinition,
-    ...selectDefinition,
-    ...switchDefinition,
-    ...formfieldDefinition,
-  };
+  private _configValueTarget(
+    ev: Event,
+  ): (EventTarget & { configValue?: keyof BoilerplateCardConfig; value?: string; checked?: boolean }) | null {
+    return ev.target as EventTarget & {
+      configValue?: keyof BoilerplateCardConfig;
+      value?: string;
+      checked?: boolean;
+    };
+  }
 
   public setConfig(config: BoilerplateCardConfig): void {
-    this._config = config;
-
+    // Deep clone and ensure proper action defaults
+    this._config = {
+      ...JSON.parse(JSON.stringify(config)),
+      // Initialize actions with proper defaults if not set
+      tap_action: config.tap_action || { action: 'toggle' },
+      hold_action: config.hold_action || { action: 'more-info' },
+      double_tap_action: config.double_tap_action || { action: 'none' },
+    };
     this.loadCardHelpers();
+    this.requestUpdate();
   }
 
   protected shouldUpdate(): boolean {
-    if (!this._initialized) {
-      this._initialize();
-    }
-
     return true;
   }
 
-  get _name(): string {
-    return this._config?.name || '';
-  }
-
-  get _entity(): string {
-    return this._config?.entity || '';
-  }
-
-  get _show_warning(): boolean {
-    return this._config?.show_warning || false;
-  }
-
-  get _show_error(): boolean {
-    return this._config?.show_error || false;
-  }
-
   protected render(): TemplateResult | void {
-    if (!this.hass || !this._helpers) {
-      return html``;
+    if (!this.hass || !this._config) {
+      return html`<div>Loading...</div>`;
     }
 
     // You can restrict on domain type
     const entities = Object.keys(this.hass.states);
 
     return html`
-      <mwc-select
-        naturalMenuWidth
-        fixedMenuPosition
+      <ha-select
+        .hass=${this.hass}
         label="Entity (Required)"
+        .value=${this._config?.entity || ''}
         .configValue=${'entity'}
-        .value=${this._entity}
-        @selected=${this._valueChanged}
-        @closed=${(ev) => ev.stopPropagation()}
+        required="true"
+        @change=${this._valueChanged}
+        @closed=${(ev: Event) => ev.stopPropagation()}
       >
-        ${entities.map((entity) => {
-          return html`<mwc-list-item .value=${entity}>${entity}</mwc-list-item>`;
-        })}
-      </mwc-select>
-      <mwc-textfield
+        ${entities.map((entity) => html` <mwc-list-item .value=${entity}>${entity}</mwc-list-item> `)}
+      </ha-select>
+      <ha-area-picker
+        .curValue=${this._config?.area || ''}
+        no-add
+        .hass=${this.hass}
+        .value=${this._config?.area || ''}
+        .configValue=${'area'}
+        label="Area to display"
+        @value-changed=${this._valueChanged}
+      >
+      </ha-area-picker>
+      <ha-textfield
         label="Name (Optional)"
-        .value=${this._name}
+        .value=${this._config?.name || ''}
         .configValue=${'name'}
         @input=${this._valueChanged}
-      ></mwc-textfield>
-      <mwc-formfield .label=${`Toggle warning ${this._show_warning ? 'off' : 'on'}`}>
-        <mwc-switch
-          .checked=${this._show_warning !== false}
+      ></ha-textfield>
+      <ha-icon-picker
+        .hass=${this.hass}
+        .value=${this._config?.icon || ''}
+        .configValue=${'icon'}
+        label="Icon (Optional)"
+        @value-changed=${this._valueChanged}
+      ></ha-icon-picker>
+      <ha-formfield label="Show Warning">
+        <ha-switch
+          .checked=${this._config?.show_warning ?? false}
           .configValue=${'show_warning'}
           @change=${this._valueChanged}
-        ></mwc-switch>
-      </mwc-formfield>
-      <mwc-formfield .label=${`Toggle error ${this._show_error ? 'off' : 'on'}`}>
-        <mwc-switch
-          .checked=${this._show_error !== false}
+        ></ha-switch>
+      </ha-formfield>
+      <ha-formfield label="Show Error">
+        <ha-switch
+          .checked=${this._config?.show_error ?? false}
           .configValue=${'show_error'}
           @change=${this._valueChanged}
-        ></mwc-switch>
-      </mwc-formfield>
+        ></ha-switch>
+      </ha-formfield>
+
+      <div class="action-header">
+        <h3>Actions Configuration</h3>
+        <p>Configure different interaction behaviors</p>
+      </div>
+
+      <ha-selector
+        .hass=${this.hass}
+        .selector=${{ ui_action: {} }}
+        .value=${this._config.tap_action}
+        label="Tap Action"
+        .configValue=${'tap_action'}
+        @value-changed=${this._actionChanged}
+      ></ha-selector>
+
+      <ha-selector
+        .hass=${this.hass}
+        .selector=${{ ui_action: {} }}
+        .value=${this._config.hold_action}
+        label="Hold Action"
+        .configValue=${'hold_action'}
+        @value-changed=${this._actionChanged}
+      ></ha-selector>
+
+      <ha-selector
+        .hass=${this.hass}
+        .selector=${{ ui_action: {} }}
+        .value=${this._config.double_tap_action}
+        label="Double Tap Action"
+        .configValue=${'double_tap_action'}
+        @value-changed=${this._actionChanged}
+      ></ha-selector>
     `;
   }
 
-  private _initialize(): void {
-    if (this.hass === undefined) return;
-    if (this._config === undefined) return;
-    if (this._helpers === undefined) return;
-    this._initialized = true;
-  }
-
-  private async loadCardHelpers(): Promise<void> {
-    this._helpers = await (window as any).loadCardHelpers();
-  }
-
-  private _valueChanged(ev): void {
+  private _valueChanged(ev: Event): void {
     if (!this._config || !this.hass) {
       return;
     }
-    const target = ev.target;
-    if (this[`_${target.configValue}`] === target.value) {
+    const target = this._configValueTarget(ev);
+    if (!target?.configValue) {
       return;
     }
-    if (target.configValue) {
-      if (target.value === '') {
-        const tmpConfig = { ...this._config };
-        delete tmpConfig[target.configValue];
-        this._config = tmpConfig;
-      } else {
-        this._config = {
-          ...this._config,
-          [target.configValue]: target.checked !== undefined ? target.checked : target.value,
-        };
-      }
+
+    const newValue = target.checked !== undefined ? target.checked : target.value;
+    if (this._config[target.configValue] === newValue) {
+      return;
     }
+
+    if (target.value === '') {
+      const tmpConfig = { ...this._config };
+      delete tmpConfig[target.configValue];
+      this._config = tmpConfig;
+    } else {
+      this._config = {
+        ...this._config,
+        [target.configValue]: newValue,
+      };
+    }
+
     fireEvent(this, 'config-changed', { config: this._config });
+    this.requestUpdate();
   }
 
-  static styles: CSSResultGroup = css`
-    mwc-select,
-    mwc-textfield {
-      margin-bottom: 16px;
-      display: block;
+  private _actionChanged(ev: CustomEvent): void {
+    if (!this._config || !this.hass) {
+      return;
     }
-    mwc-formfield {
-      padding-bottom: 8px;
+
+    const target = ev.target as any;
+    const configValue = target.configValue;
+
+    if (!configValue) {
+      return;
     }
-    mwc-switch {
-      --mdc-theme-secondary: var(--switch-checked-color);
+
+    const newAction = ev.detail.value as ActionConfig;
+
+    // Create a clean copy without undefined values
+    const updatedConfig = { ...this._config };
+
+    // Handle action updates - ensure we always have a valid action object
+    if (newAction && newAction.action) {
+      updatedConfig[configValue as keyof BoilerplateCardConfig] = newAction;
+    } else {
+      // Set appropriate default if action is cleared/invalid
+      const defaults = {
+        tap_action: { action: 'toggle' },
+        hold_action: { action: 'more-info' },
+        double_tap_action: { action: 'none' },
+      };
+      updatedConfig[configValue as keyof BoilerplateCardConfig] = defaults[configValue as keyof typeof defaults] || {
+        action: 'none',
+      };
     }
-  `;
+
+    this._config = updatedConfig;
+
+    fireEvent(this, 'config-changed', { config: this._config });
+    this.requestUpdate();
+  }
+
+  private async loadCardHelpers(): Promise<void> {
+    try {
+      this._helpers = await (window as any).loadCardHelpers();
+    } catch (e) {
+      // Card helpers failed to load, continue without them
+      console.warn('Failed to load card helpers:', e);
+    }
+  }
+
+  static get styles() {
+    return [
+      css`
+        ha-select,
+        ha-textfield,
+        ha-icon-picker,
+        ha-formfield,
+        ha-selector {
+          margin-bottom: 16px;
+          display: block;
+        }
+        ha-formfield {
+          padding: 16px 0;
+        }
+        .action-header {
+          margin: 24px 0 16px 0;
+          padding: 16px 0 0 0;
+          border-top: 1px solid var(--divider-color);
+        }
+        .action-header h3 {
+          margin: 0 0 8px 0;
+          color: var(--primary-text-color);
+          font-size: 16px;
+          font-weight: 500;
+        }
+        .action-header p {
+          margin: 0;
+          color: var(--secondary-text-color);
+          font-size: 14px;
+        }
+      `,
+    ];
+  }
+}
+
+// Explicit element registration as fallback
+if (!customElements.get('boilerplate-card-editor')) {
+  customElements.define('boilerplate-card-editor', BoilerplateCardEditor);
 }
