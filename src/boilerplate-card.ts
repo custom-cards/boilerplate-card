@@ -114,6 +114,11 @@ export class BoilerplateCard extends LitElement {
       disableKbd: false,
     };
 
+    const accentColor = this.config.accent_color;
+    const cardStyle = accentColor
+      ? `--card-accent-color: rgb(${accentColor[0]},${accentColor[1]},${accentColor[2]});`
+      : '';
+
     return html`
       <ha-card
         .header=${this.config.name}
@@ -122,7 +127,8 @@ export class BoilerplateCard extends LitElement {
         .config=${this.config}
         tabindex="0"
         .label=${`Boilerplate: ${this.config.entity}`}
-        class="clickable-card"
+        class="clickable-card style-${this.config.card_style || 'default'}"
+        style=${cardStyle}
       >
         <div class="card-content">
           <div class="entity-row clickable-row" @click=${this._handleEntityClick}>
@@ -138,12 +144,14 @@ export class BoilerplateCard extends LitElement {
             </div>
           </div>
 
-          ${this._renderAttributes(stateObj)} ${this._renderActionButtons(stateObj)}
-
-          <div class="timestamps">
-            <div class="last-changed"><strong>Last Changed:</strong> ${formatTimestamp(stateObj.last_changed)}</div>
-            <div class="last-updated"><strong>Last Updated:</strong> ${formatTimestamp(stateObj.last_updated)}</div>
-          </div>
+          ${this._renderAttributes(stateObj, this.config.attribute_limit ?? 3)}
+          ${this.config.card_style !== 'minimal' ? this._renderActionButtons(stateObj) : ''}
+          ${this.config.show_timestamps !== false
+            ? html` <div class="timestamps">
+                <div class="last-changed"><strong>Last Changed:</strong> ${formatTimestamp(stateObj.last_changed)}</div>
+                <div class="last-updated"><strong>Last Updated:</strong> ${formatTimestamp(stateObj.last_updated)}</div>
+              </div>`
+            : ''}
         </div>
         <ha-ripple
           .disabled=${!hasAction(this.config.tap_action) &&
@@ -232,11 +240,12 @@ export class BoilerplateCard extends LitElement {
     return html` ${errorCard} `;
   }
 
-  private _renderAttributes(stateObj: HassEntity): TemplateResult {
+  private _renderAttributes(stateObj: HassEntity, limit = 3): TemplateResult {
+    if (limit === 0) return html``;
     const importantAttrs = ['battery_level', 'temperature', 'humidity', 'brightness', 'volume_level'];
     const attrs = Object.entries(stateObj.attributes)
       .filter(([key, _]) => importantAttrs.includes(key))
-      .slice(0, 3); // Limit to 3 attributes
+      .slice(0, limit);
 
     if (attrs.length === 0) {
       return html``;
@@ -411,12 +420,53 @@ export class BoilerplateCard extends LitElement {
 
       .icon {
         margin-right: 16px;
-        color: var(--state-icon-color, var(--state-icon-active-color));
+        color: var(--card-accent-color, var(--state-icon-color, var(--state-icon-active-color)));
         transition: color 0.2s ease-in-out;
       }
 
       .clickable-row:hover .icon {
-        color: var(--primary-color);
+        color: var(--card-accent-color, var(--primary-color));
+      }
+
+      /* Card style variants */
+      .style-compact .card-content {
+        padding: 8px;
+      }
+      .style-compact .entity-row {
+        margin-bottom: 8px;
+      }
+      .style-compact .name {
+        font-size: 14px;
+      }
+      .style-compact .state {
+        font-size: 12px;
+      }
+      .style-compact .action-buttons,
+      .style-compact .attributes {
+        margin: 8px 0;
+        padding: 8px;
+      }
+
+      .style-detailed .name {
+        font-size: 20px;
+      }
+      .style-detailed .state {
+        font-size: 16px;
+      }
+      .style-detailed .icon ha-icon {
+        width: 36px;
+        height: 36px;
+      }
+      .style-detailed .card-content {
+        padding: 24px;
+      }
+
+      .style-minimal .card-content {
+        padding: 12px 16px;
+      }
+      .style-minimal .attributes,
+      .style-minimal .timestamps {
+        display: none;
       }
 
       .icon ha-icon {

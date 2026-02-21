@@ -35,6 +35,11 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
       tap_action: config.tap_action || { action: 'toggle' },
       hold_action: config.hold_action || { action: 'more-info' },
       double_tap_action: config.double_tap_action || { action: 'none' },
+      // Appearance defaults
+      card_style: config.card_style || 'default',
+      // Display defaults
+      show_timestamps: config.show_timestamps ?? true,
+      attribute_limit: config.attribute_limit ?? 3,
     };
     this.loadCardHelpers();
     this.requestUpdate();
@@ -133,6 +138,59 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
         .configValue=${'double_tap_action'}
         @value-changed=${this._actionChanged}
       ></ha-selector>
+
+      <div class="section-header">
+        <h3>Appearance</h3>
+      </div>
+
+      <ha-selector
+        .hass=${this.hass}
+        .selector=${{
+          select: {
+            options: [
+              { value: 'default', label: 'Default' },
+              { value: 'compact', label: 'Compact — condensed spacing' },
+              { value: 'detailed', label: 'Detailed — larger text & icons' },
+              { value: 'minimal', label: 'Minimal — entity row only' },
+            ],
+            mode: 'list',
+          },
+        }}
+        .value=${this._config.card_style || 'default'}
+        label="Card Style"
+        .configValue=${'card_style'}
+        @value-changed=${this._selectorChanged}
+      ></ha-selector>
+
+      <ha-selector
+        .hass=${this.hass}
+        .selector=${{ color_rgb: {} }}
+        .value=${this._config.accent_color || null}
+        label="Accent Color"
+        .configValue=${'accent_color'}
+        @value-changed=${this._selectorChanged}
+      ></ha-selector>
+
+      <div class="section-header">
+        <h3>Display</h3>
+      </div>
+
+      <ha-selector
+        .hass=${this.hass}
+        .selector=${{ number: { min: 0, max: 10, step: 1, mode: 'box' } }}
+        .value=${this._config.attribute_limit ?? 3}
+        label="Attribute Limit"
+        .configValue=${'attribute_limit'}
+        @value-changed=${this._selectorChanged}
+      ></ha-selector>
+
+      <ha-formfield label="Show Timestamps">
+        <ha-switch
+          .checked=${this._config?.show_timestamps ?? true}
+          .configValue=${'show_timestamps'}
+          @change=${this._valueChanged}
+        ></ha-switch>
+      </ha-formfield>
     `;
   }
 
@@ -161,6 +219,23 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
       };
     }
 
+    fireEvent(this, 'config-changed', { config: this._config });
+    this.requestUpdate();
+  }
+
+  private _selectorChanged(ev: CustomEvent): void {
+    if (!this._config || !this.hass) {
+      return;
+    }
+    const target = ev.target as any;
+    const configValue = target.configValue as keyof BoilerplateCardConfig;
+    if (!configValue) {
+      return;
+    }
+    this._config = {
+      ...this._config,
+      [configValue]: ev.detail.value,
+    };
     fireEvent(this, 'config-changed', { config: this._config });
     this.requestUpdate();
   }
@@ -241,6 +316,17 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
           margin: 0;
           color: var(--secondary-text-color);
           font-size: 14px;
+        }
+        .section-header {
+          margin: 24px 0 12px 0;
+          padding: 16px 0 0 0;
+          border-top: 1px solid var(--divider-color);
+        }
+        .section-header h3 {
+          margin: 0;
+          color: var(--primary-text-color);
+          font-size: 16px;
+          font-weight: 500;
         }
       `,
     ];

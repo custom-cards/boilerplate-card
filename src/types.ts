@@ -13,6 +13,7 @@ export interface BoilerplateCardConfig extends LovelaceCardConfig {
   name?: string;
   show_warning?: boolean;
   show_error?: boolean;
+  show_timestamps?: boolean;
   test_gui?: boolean;
   entity?: string;
   area?: string;
@@ -20,4 +21,9 @@ export interface BoilerplateCardConfig extends LovelaceCardConfig {
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
   double_tap_action?: ActionConfig;
+  // Appearance
+  card_style?: 'default' | 'compact' | 'detailed' | 'minimal';
+  accent_color?: [number, number, number]; // RGB array [r, g, b]
+  // Display
+  attribute_limit?: number;
 }
