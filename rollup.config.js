@@ -38,7 +38,7 @@ export default [
   {
     input: 'src/boilerplate-card.ts',
     output: {
-      dir: 'dist',
+      file: 'dist/boilerplate-card.js',
       format: 'es',
       inlineDynamicImports: true,
     },

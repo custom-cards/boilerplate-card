@@ -15,10 +15,9 @@ const onwarn = (warning, warn) => {
 export default {
   input: ['src/boilerplate-card.ts'],
   output: {
-    dir: './dist',
+    file: './dist/boilerplate-card.js',
     format: 'es',
     inlineDynamicImports: true,
-    entryFileNames: '[name].js', // Generates boilerplate-card.js without hash
   },
   plugins: [
     resolve(),
