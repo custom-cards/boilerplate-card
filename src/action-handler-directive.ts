@@ -2,10 +2,14 @@ import { ActionHandlerDetail, ActionHandlerOptions } from 'custom-card-helpers/d
 import { directive, Directive, ElementPart, PartInfo } from 'lit/directive.js';
 import { deepEqual, fireEvent } from 'custom-card-helpers';
 
-const customFireEvent = (node: HTMLElement, type: string, detail: Record<string, unknown>) =>
-  fireEvent(node, type as any, detail);
+const customFireEvent = <T extends keyof HASSDomEvents>(node: HTMLElement, type: T, detail: HASSDomEvents[T]): void => {
+  fireEvent(node, type, detail);
+};
 
-const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || (navigator as any).msMaxTouchPoints > 0;
+const isTouch =
+  'ontouchstart' in window ||
+  navigator.maxTouchPoints > 0 ||
+  ('msMaxTouchPoints' in navigator && (navigator as Navigator & { msMaxTouchPoints: number }).msMaxTouchPoints > 0);
 
 interface ActionHandler extends HTMLElement {
   holdTime: number;
@@ -277,13 +281,14 @@ const getActionHandler = (): ActionHandler => {
   div.style.background = 'rgba(var(--rgb-primary-color), 0.3)';
 
   // Add ActionHandler properties
-  (div as any).holdTime = 500;
-  (div as any).cancelled = false;
-  (div as any).held = false;
-  (div as any).timer = undefined;
-  (div as any).dblClickTimeout = undefined;
-  (div as any).isRepeating = false;
-  (div as any).repeatTimeout = undefined;
+  const typedDiv = div as unknown as ActionHandler;
+  typedDiv.holdTime = 500;
+  typedDiv.cancelled = false;
+  typedDiv.held = false;
+  typedDiv.timer = undefined;
+  typedDiv.dblClickTimeout = undefined;
+  typedDiv.isRepeating = false;
+  typedDiv.repeatTimeout = undefined;
 
   body.appendChild(div);
 

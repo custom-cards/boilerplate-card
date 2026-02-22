@@ -40,6 +40,9 @@ export default [
       ...js.configs.recommended.rules,
       ...tsPlugin.configs.recommended.rules,
       ...prettierConfig.rules,
+      // TypeScript's compiler already catches undefined references in .ts files,
+      // so no-undef produces false positives on TS interfaces, enums and globals.
+      'no-undef': 'off',
       'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
