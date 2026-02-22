@@ -76,22 +76,6 @@ hold_action:
 double_tap_action:
   action: navigate
   navigation_path: /lovelace/lights
-conditions:
-  - entity: binary_sensor.home_occupied
-    operator: equals
-    value: "on"
-entities:
-  - entity: light.living_room
-    name: Main Light
-  - entity: light.floor_lamp
-    name: Floor Lamp
-attribute_config:
-  - key: brightness
-    label: Brightness
-    unit: "%"
-  - key: color_temp
-    label: Colour Temp
-    unit: K
 ```
 
 ---
