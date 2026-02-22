@@ -13,7 +13,7 @@ const onwarn = (warning, warn) => {
 };
 
 export default {
-  input: ['src/boilerplate-card.ts'],
+  input: 'src/boilerplate-card.ts',
   output: {
     file: './dist/boilerplate-card.js',
     format: 'es',
@@ -37,8 +37,11 @@ export default {
   watch: {
     include: 'src/**',
     exclude: 'node_modules/**',
-    polling: 2000, // Poll every 2000ms for file changes (slower but more reliable on docker mounts)
-    debounce: 500, // Wait 500ms after last change before rebuilding
+    buildDelay: 500,
+    chokidar: {
+      usePolling: true,  // Required for reliable file detection on Docker volume mounts
+      interval: 1000,
+    },
   },
   onwarn,
 };
