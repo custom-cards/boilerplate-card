@@ -137,7 +137,7 @@ double_tap_action:
 
 | Name              | Type    | Required     | Description                                         | Default |
 | ----------------- | ------- | ------------ | --------------------------------------------------- | ------- |
-| `attribute_limit` | number  | **Optional** | Maximum number of attributes to display (`0` = none) | `3`     |
+| `attribute_limit` | number  | **Optional** | Maximum number of attributes to display (`0` = none). Shown as a slider (0–10) in the visual editor. | `3`     |
 | `show_timestamps` | boolean | **Optional** | Show last changed / last updated timestamps         | `true`  |
 
 ---

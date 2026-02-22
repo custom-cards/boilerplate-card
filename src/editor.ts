@@ -207,7 +207,7 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
         html`
           <ha-selector
             .hass=${this.hass}
-            .selector=${{ number: { min: 0, max: 10, step: 1, mode: 'box' } }}
+            .selector=${{ number: { min: 0, max: 10, step: 1, mode: 'slider' } }}
             .value=${this._config.attribute_limit ?? 3}
             label="Attribute Limit"
             .configValue=${'attribute_limit'}
@@ -321,8 +321,8 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
     } else {
       // Set appropriate default if action is cleared/invalid
       const defaults = {
-        tap_action: { action: 'toggle' },
-        hold_action: { action: 'more-info' },
+        tap_action: { action: 'more-info' },
+        hold_action: { action: 'none' },
         double_tap_action: { action: 'none' },
       };
       updatedConfig[configValue as keyof BoilerplateCardConfig] = defaults[configValue as keyof typeof defaults] || {
