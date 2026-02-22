@@ -28,6 +28,7 @@ export default [
         clearInterval: 'readonly',
         setInterval: 'readonly',
         customElements: 'readonly',
+        structuredClone: 'readonly',
       },
     },
     plugins: {

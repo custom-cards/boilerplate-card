@@ -26,7 +26,7 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
   public setConfig(config: BoilerplateCardConfig): void {
     // Deep clone and ensure proper action defaults
     this._config = {
-      ...JSON.parse(JSON.stringify(config)),
+      ...structuredClone(config),
       // Initialize actions with proper defaults if not set
       tap_action: config.tap_action || { action: 'toggle' },
       hold_action: config.hold_action || { action: 'more-info' },
@@ -39,7 +39,6 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
       show_timestamps: config.show_timestamps ?? true,
       attribute_limit: config.attribute_limit ?? 3,
     };
-    this.loadCardHelpers();
     this.requestUpdate();
   }
 
@@ -335,15 +334,6 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
 
     fireEvent(this, 'config-changed', { config: this._config });
     this.requestUpdate();
-  }
-
-  private async loadCardHelpers(): Promise<void> {
-    try {
-      this._helpers = await (window as any).loadCardHelpers();
-    } catch (e) {
-      // Card helpers failed to load, continue without them
-      console.warn('Failed to load card helpers:', e);
-    }
   }
 
   static get styles() {
