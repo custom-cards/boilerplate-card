@@ -21,6 +21,8 @@ export interface BoilerplateCardConfig extends LovelaceCardConfig {
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
   double_tap_action?: ActionConfig;
+  press_action?: ActionConfig;
+  release_action?: ActionConfig;
   // Appearance
   card_style?: 'default' | 'compact' | 'detailed' | 'minimal';
   accent_color?: [number, number, number]; // RGB array [r, g, b]
