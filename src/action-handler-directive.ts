@@ -320,7 +320,7 @@ class ActionHandlerDirective extends Directive {
   update(part: ElementPart, [options]: [ActionHandlerOptions?]) {
     if (!deepEqual(options, this.previousOptions)) {
       actionHandlerBind(part.element as ActionHandlerElement, options);
-      this.previousOptions = { ...options };
+      this.previousOptions = options ? { ...options } : undefined;
     }
     return this.render(options);
   }
