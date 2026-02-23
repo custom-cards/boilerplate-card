@@ -50,8 +50,5 @@
     "clean": "rm -rf dist/*",
     "lint": "eslint src/**/*.ts",
     "rollup": "rollup -c"
-  },
-  "overrides": {
-    "@lit/reactive-element": "1.6.3"
   }
 }

@@ -14,7 +14,7 @@ const onwarn = (warning, warn) => {
 export default {
   input: 'src/boilerplate-card.ts',
   output: {
-    file: '/tmp/dev-build/boilerplate-card.js',
+    file: './dist',
     format: 'es',
     inlineDynamicImports: true,
   },
@@ -23,7 +23,7 @@ export default {
     esbuild({ target: 'es2022' }),
     json(),
     serve({
-      contentBase: '/tmp/dev-build',
+      contentBase: './dist',
       host: '0.0.0.0',
       port: 5000,
       allowCrossOrigin: true,

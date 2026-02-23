@@ -28,8 +28,8 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
     this._config = {
       ...structuredClone(config),
       // Initialize actions with proper defaults if not set
-      tap_action: config.tap_action || { action: 'toggle' },
-      hold_action: config.hold_action || { action: 'more-info' },
+      tap_action: config.tap_action || { action: 'more-info' },
+      hold_action: config.hold_action || { action: 'none' },
       double_tap_action: config.double_tap_action || { action: 'none' },
       // Appearance defaults
       card_style: config.card_style || 'default',
