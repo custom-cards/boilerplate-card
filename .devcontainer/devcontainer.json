@@ -30,12 +30,12 @@
     "DEVCONTAINER": "1",
     "HASS_USERNAME": "dev",
     "HASS_PASSWORD": "dev",
-    "LOVELACE_LOCAL_FILES": "boilerplate-card.js"
+    "LOVELACE_REMOTE_FILES": "http://localhost:5000/boilerplate-card.js"
   },
 
   // Setup Home Assistant and install dependencies
-  "postCreateCommand": "container setup && npm install && npm run build",
-  "postStartCommand": "container launch",
+  "postCreateCommand": "container setup && npm install",
+  "postStartCommand": "container launch & npm run start & wait",
 
   // VS Code extensions for development
   "customizations": {
@@ -59,7 +59,8 @@
         "typescript.tsserver.pluginPaths": [
           "node_modules/typescript/lib"
         ],
-        "files.eol": "\n"
+        "files.eol": "\n",
+        "task.allowAutomaticTasks": "on"
       }
     }
   }
