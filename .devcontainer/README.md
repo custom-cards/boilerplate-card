@@ -29,8 +29,7 @@ This directory contains the development container configuration for building and
 5. **Configure Home Assistant to Use Your Card**
    - In Home Assistant, go to Settings > Dashboards
    - Create a new Dashboard
-   - Add your custom card:
-   - Add Boilerplat Card from GUI
+   - Add the card from the GUI
 
 ## File Structure
 
