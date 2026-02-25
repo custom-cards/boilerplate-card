@@ -6,6 +6,14 @@
   // Use pre-built Home Assistant devcontainer image
   "image": "thomasloven/hass-custom-devcontainer:latest",
 
+  // Install Node.js 24 on top of the base image
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "24",
+      "nvmInstallPath": "/home/vscode/.nvm"
+    }
+  },
+
   // Set working directory
   "workspaceFolder": "/workspaces/test",
   
@@ -27,6 +35,7 @@
 
   // Container environment variables for Home Assistant setup
   "containerEnv": {
+    "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0",
     "DEVCONTAINER": "1",
     "HASS_USERNAME": "dev",
     "HASS_PASSWORD": "dev",
@@ -34,8 +43,8 @@
   },
 
   // Setup Home Assistant and install dependencies
-  "postCreateCommand": "container setup && npm install",
-  "postStartCommand": "container launch & npm run start & wait",
+  "postCreateCommand": "container setup && corepack enable && yarn install",
+  "postStartCommand": "container launch & yarn start & wait",
 
   // VS Code extensions for development
   "customizations": {

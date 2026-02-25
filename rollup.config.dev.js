@@ -14,7 +14,7 @@ const onwarn = (warning, warn) => {
 export default {
   input: 'src/boilerplate-card.ts',
   output: {
-    file: './dist',
+    file: './dist/boilerplate-card.js',
     format: 'es',
     inlineDynamicImports: true,
   },

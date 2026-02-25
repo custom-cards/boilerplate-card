@@ -2,6 +2,7 @@
   "name": "boilerplate-card",
   "type": "module",
   "version": "2.0.0",
+  "packageManager": "yarn@4.12.0",
   "description": "Lovelace boilerplate-card",
   "keywords": [
     "home-assistant",
@@ -32,6 +33,7 @@
     "@rollup/plugin-typescript": "^11.1.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
+    "esbuild": "^0.20.2",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
@@ -46,7 +48,7 @@
   },
   "scripts": {
     "start": "rollup -c rollup.config.dev.js --watch",
-    "build": "npm run clean && npm run lint && npm run rollup",
+    "build": "yarn clean && yarn lint && yarn rollup",
     "clean": "rm -rf dist/*",
     "lint": "eslint src/**/*.ts",
     "rollup": "rollup -c"

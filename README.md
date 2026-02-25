@@ -148,10 +148,10 @@ double_tap_action:
 
 | Tool    | Minimum version | Notes                               |
 | ------- | --------------- | ----------------------------------- |
-| Node.js | 18              | Tested on 20 LTS and 22 LTS         |
-| npm     | 10              |                                     |
+| Node.js | 24              | Required by `custom-card-helpers@2` |
+| Yarn    | 4               | Managed via Corepack                |
 
-TypeScript, Rollup, ESLint, and all other build tools are installed locally via `npm install` — no global installs needed.
+TypeScript, Rollup, ESLint, and all other build tools are installed locally via `yarn install` — no global installs needed.
 
 ### Quick start — devcontainer (recommended)
 
@@ -161,7 +161,7 @@ The devcontainer gives you a full HA development environment in one click with n
 2. When prompted, click **Reopen in Container** (or run **Dev Containers: Rebuild Container**).
 3. A local Home Assistant instance starts automatically at `http://localhost:8123`.
 4. Log in with `dev` / `dev`.
-5. The built card is served from the container and hot-reloads on every save (`npm run start` is launched automatically).
+5. The built card is served from the container and hot-reloads on every save (`yarn start` is launched automatically).
 
 **Requires:** [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 
@@ -173,13 +173,13 @@ git clone https://github.com/custom-cards/boilerplate-card.git my-card
 cd my-card
 
 # 2. Install dependencies
-npm install
+yarn install
 
 # 3. Verify the build works
-npm run build
+yarn build
 
 # 4. Start the development watcher
-npm run start
+yarn start
 ```
 
 Then add your local file as a Lovelace resource:
@@ -196,10 +196,10 @@ Copy or symlink `dist/boilerplate-card.js` into your HA `www/` folder, or use th
 
 | Command          | Description                                             |
 | ---------------- | ------------------------------------------------------- |
-| `npm run build`  | Lint + production bundle (minified, ES2022 output)      |
-| `npm run rollup` | Production bundle only (skips lint)                     |
-| `npm run start`  | Development watcher with hot reload (`rollup --watch`)  |
-| `npm run lint`   | ESLint across all `src/` files                          |
+| `yarn build`     | Lint + production bundle (minified, ES2022 output)      |
+| `yarn rollup`    | Production bundle only (skips lint)                     |
+| `yarn start`     | Development watcher with hot reload (`rollup --watch`)  |
+| `yarn lint`      | ESLint across all `src/` files                          |
 
 ### Project structure
 
@@ -283,8 +283,8 @@ private _handleAction(ev: ActionHandlerEvent): void {
 
 ### Contributing
 
-1. Fork the repository and create a feature branch from `main`.
-2. Run `npm run build` before opening a PR — all lint checks must pass.
+1. Fork the repository and create a feature branch from `master`.
+2. Run `yarn build` before opening a PR — all lint checks must pass.
 3. Keep PRs focused on a single change.
 4. Code style is enforced automatically by Prettier and ESLint on build.
 

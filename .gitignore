@@ -10,3 +10,5 @@ homeassistant/
 .devcontainer/config/custom_components/
 .devcontainer/config/.HA_VERSION
 .devcontainer/config/known_devices.yaml
+.devcontainer/config/.ha_run.lock
+.yarn/

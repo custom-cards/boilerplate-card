@@ -14,15 +14,17 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
-          cache: 'npm'
+          node-version: '24'
+          cache: 'yarn'
 
       # Build
       - name: Install dependencies
-        run: npm ci
+        run: |
+          corepack enable
+          yarn install --immutable
 
       - name: Build the file
-        run: npm run build
+        run: yarn build
 
       # Upload build artifact to the release as an asset.
       - name: Upload release asset
