@@ -49,7 +49,7 @@
   "scripts": {
     "start": "rollup -c rollup.config.dev.js --watch",
     "build": "yarn clean && yarn lint && yarn rollup",
-    "clean": "rm -rf dist/*",
+    "clean": "rm -rf dist",
     "lint": "eslint src/**/*.ts",
     "rollup": "rollup -c"
   }
