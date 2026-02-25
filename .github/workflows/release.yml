@@ -8,6 +8,8 @@ jobs:
   release:
     name: Prepare release
     runs-on: ubuntu-latest
+    env:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: 0
     steps:
       - uses: actions/checkout@v4
 
@@ -15,12 +17,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
-          cache: 'yarn'
 
       # Build
       - name: Install dependencies
         run: |
           corepack enable
+          corepack prepare yarn@4.12.0 --activate
           yarn install --immutable
 
       - name: Build the file
