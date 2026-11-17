@@ -7,16 +7,6 @@
   "image": "ghcr.io/custom-cards/custom-card-devcontainer:latest",
   "remoteUser": "vscode",
 
-  // Set working directory
-  "workspaceFolder": "/workspaces/test",
-  
-  // Mount project to workspace, dist to Lovelace plugins, and config directory for Home Assistant
-  "mounts": [
-    "source=${localWorkspaceFolder},target=/workspaces/test,type=bind",
-    "source=${localWorkspaceFolder}/dist,target=/config/www/workspace,type=bind",
-    "source=${localWorkspaceFolder}/.devcontainer/config,target=/config,type=bind"
-  ],
-
   // Forward Home Assistant port
   "forwardPorts": [8123],
   "portsAttributes": {
@@ -32,6 +22,9 @@
     "DEVCONTAINER": "1",
     "HASS_USERNAME": "dev",
     "HASS_PASSWORD": "dev",
+    // Keep the Home Assistant config inside the workspace instead of bind-mounting it,
+    // so this also works with "Clone Repository in Container Volume"
+    "HASS_CONFIG_DIR": "${containerWorkspaceFolder}/.devcontainer/config",
     "LOVELACE_REMOTE_FILES": "http://localhost:5000/boilerplate-card.js"
   },
 
