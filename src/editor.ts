@@ -51,24 +51,20 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
       return html`<div>Loading...</div>`;
     }
 
-    const entities = Object.keys(this.hass.states);
-
     return html`
       ${this._renderSection(
         'entity',
         'Entity',
         html`
-          <ha-select
+          <ha-selector
             .hass=${this.hass}
-            label="Entity (Required)"
+            .selector=${{ entity: {} }}
             .value=${this._config?.entity || ''}
+            label="Entity (Required)"
             .configValue=${'entity'}
-            required="true"
-            @change=${this._valueChanged}
-            @closed=${(ev: Event) => ev.stopPropagation()}
-          >
-            ${entities.map((entity) => html` <mwc-list-item .value=${entity}>${entity}</mwc-list-item> `)}
-          </ha-select>
+            .required=${true}
+            @value-changed=${this._selectorChanged}
+          ></ha-selector>
           <ha-area-picker
             .curValue=${this._config?.area || ''}
             no-add
@@ -78,12 +74,15 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
             label="Area to display"
             @value-changed=${this._valueChanged}
           ></ha-area-picker>
-          <ha-textfield
-            label="Name (Optional)"
+          <ha-selector
+            .hass=${this.hass}
+            .selector=${{ text: {} }}
             .value=${this._config?.name || ''}
+            label="Name (Optional)"
             .configValue=${'name'}
-            @input=${this._valueChanged}
-          ></ha-textfield>
+            .required=${false}
+            @value-changed=${this._selectorChanged}
+          ></ha-selector>
           <ha-icon-picker
             .hass=${this.hass}
             .value=${this._config?.icon || ''}
@@ -91,20 +90,22 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
             label="Icon (Optional)"
             @value-changed=${this._valueChanged}
           ></ha-icon-picker>
-          <ha-formfield label="Show Warning">
-            <ha-switch
-              .checked=${this._config?.show_warning ?? false}
-              .configValue=${'show_warning'}
-              @change=${this._valueChanged}
-            ></ha-switch>
-          </ha-formfield>
-          <ha-formfield label="Show Error">
-            <ha-switch
-              .checked=${this._config?.show_error ?? false}
-              .configValue=${'show_error'}
-              @change=${this._valueChanged}
-            ></ha-switch>
-          </ha-formfield>
+          <ha-selector
+            .hass=${this.hass}
+            .selector=${{ boolean: {} }}
+            .value=${this._config?.show_warning ?? false}
+            label="Show Warning"
+            .configValue=${'show_warning'}
+            @value-changed=${this._selectorChanged}
+          ></ha-selector>
+          <ha-selector
+            .hass=${this.hass}
+            .selector=${{ boolean: {} }}
+            .value=${this._config?.show_error ?? false}
+            label="Show Error"
+            .configValue=${'show_error'}
+            @value-changed=${this._selectorChanged}
+          ></ha-selector>
         `,
       )}
       ${this._renderSection(
@@ -157,6 +158,7 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
             .value=${this._config.card_style || 'default'}
             label="Card Style"
             .configValue=${'card_style'}
+            .required=${false}
             @value-changed=${this._selectorChanged}
           ></ha-selector>
           <ha-selector
@@ -165,6 +167,7 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
             .value=${this._config.accent_color || null}
             label="Accent Color"
             .configValue=${'accent_color'}
+            .required=${false}
             @value-changed=${this._selectorChanged}
           ></ha-selector>
           <ha-selector
@@ -181,6 +184,7 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
             .value=${this._config.layout || 'vertical'}
             label="Layout"
             .configValue=${'layout'}
+            .required=${false}
             @value-changed=${this._selectorChanged}
           ></ha-selector>
           <ha-selector
@@ -197,6 +201,7 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
             .value=${this._config.display_mode || 'card'}
             label="Display Mode"
             .configValue=${'display_mode'}
+            .required=${false}
             @value-changed=${this._selectorChanged}
           ></ha-selector>
         `,
@@ -211,15 +216,17 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
             .value=${this._config.attribute_limit ?? 3}
             label="Attribute Limit"
             .configValue=${'attribute_limit'}
+            .required=${false}
             @value-changed=${this._selectorChanged}
           ></ha-selector>
-          <ha-formfield label="Show Timestamps">
-            <ha-switch
-              .checked=${this._config?.show_timestamps ?? true}
-              .configValue=${'show_timestamps'}
-              @change=${this._valueChanged}
-            ></ha-switch>
-          </ha-formfield>
+          <ha-selector
+            .hass=${this.hass}
+            .selector=${{ boolean: {} }}
+            .value=${this._config?.show_timestamps ?? true}
+            label="Show Timestamps"
+            .configValue=${'show_timestamps'}
+            @value-changed=${this._selectorChanged}
+          ></ha-selector>
         `,
       )}
     `;
@@ -290,10 +297,18 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
     if (!configValue) {
       return;
     }
-    this._config = {
-      ...this._config,
-      [configValue]: ev.detail.value,
-    };
+    const value = ev.detail.value;
+    if (value === '' || value === undefined || value === null) {
+      // Cleared field: drop the key so the card falls back to its default
+      const tmpConfig = { ...this._config };
+      delete tmpConfig[configValue];
+      this._config = tmpConfig;
+    } else {
+      this._config = {
+        ...this._config,
+        [configValue]: value,
+      };
+    }
     fireEvent(this, 'config-changed', { config: this._config });
     this.requestUpdate();
   }
@@ -340,16 +355,11 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
     return [
       css`
         /* ── Controls inside accordion bodies ── */
-        ha-select,
-        ha-textfield,
+        ha-area-picker,
         ha-icon-picker,
-        ha-formfield,
         ha-selector {
           margin-bottom: 16px;
           display: block;
-        }
-        ha-formfield {
-          padding: 16px 0;
         }
 
         /* ── Accordion ── */
